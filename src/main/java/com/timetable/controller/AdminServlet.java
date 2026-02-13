@@ -21,6 +21,7 @@ import jakarta.servlet.http.HttpServletResponse;
 public class AdminServlet extends HttpServlet {
     private final ResourceService resourceService = new ResourceService();
     private final SchedulerService schedulerService = new SchedulerService();
+    private final com.timetable.service.EnhancedSchedulerService enhancedSchedulerService = new com.timetable.service.EnhancedSchedulerService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -52,6 +53,30 @@ public class AdminServlet extends HttpServlet {
                     System.err.println("ERROR in SampleDataInitializer:");
                     e.printStackTrace();
                     req.setAttribute("message", "Error loading sample data: " + e.getMessage());
+                }
+            } else if ("load_enhanced_data".equals(action)) {
+                System.out.println("=== LOAD ENHANCED SAMPLE DATA ACTION TRIGGERED ===");
+                try {
+                    com.timetable.util.EnhancedSampleDataInitializer.initialize();
+                    req.setAttribute("message",
+                            "Enhanced Sample Data Loaded Successfully! (TY BSc CS with 3 Divisions)");
+                    System.out.println("Enhanced sample data loaded successfully");
+                } catch (Exception e) {
+                    System.err.println("ERROR in EnhancedSampleDataInitializer:");
+                    e.printStackTrace();
+                    req.setAttribute("message", "Error loading enhanced data: " + e.getMessage());
+                }
+            } else if ("generate_enhanced".equals(action)) {
+                System.out.println("=== GENERATE ENHANCED TIMETABLE ACTION TRIGGERED ===");
+                try {
+                    boolean success = enhancedSchedulerService.generateDivisionBasedTimetable();
+                    req.setAttribute("message",
+                            success ? "Division-Based Timetable Generated Successfully!" : "Generation Failed!");
+                    System.out.println("Enhanced generation result: " + success);
+                } catch (Exception e) {
+                    System.err.println("ERROR in generateDivisionBasedTimetable:");
+                    e.printStackTrace();
+                    req.setAttribute("message", "Error during enhanced generation: " + e.getMessage());
                 }
             }
 

@@ -28,6 +28,18 @@ public class Workload {
     @JoinColumn(name = "student_group_id", nullable = false)
     private StudentGroup studentGroup;
 
+    @ManyToOne
+    @JoinColumn(name = "division_id")
+    private Division division; // Which division this workload is for
+
+    @ManyToOne
+    @JoinColumn(name = "batch_id")
+    private Batch batch; // null for theory, specific batch for practicals
+
+    @Enumerated(EnumType.STRING)
+    @Column
+    private SessionType sessionType; // THEORY or PRACTICAL
+
     public Long getId() {
         return id;
     }
@@ -58,5 +70,29 @@ public class Workload {
 
     public void setStudentGroup(StudentGroup studentGroup) {
         this.studentGroup = studentGroup;
+    }
+
+    public Division getDivision() {
+        return division;
+    }
+
+    public void setDivision(Division division) {
+        this.division = division;
+    }
+
+    public Batch getBatch() {
+        return batch;
+    }
+
+    public void setBatch(Batch batch) {
+        this.batch = batch;
+    }
+
+    public SessionType getSessionType() {
+        return sessionType;
+    }
+
+    public void setSessionType(SessionType sessionType) {
+        this.sessionType = sessionType;
     }
 }

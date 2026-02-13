@@ -39,12 +39,15 @@
                                 href="#list-group">Student Groups</a>
                             <a class="list-group-item list-group-item-action" id="list-workload-list"
                                 data-bs-toggle="list" href="#list-workload">Assign Workload</a>
-                            <a class="list-group-item list-group-item-action bg-warning text-dark mt-3"
-                                href="admin?action=generate">Generate Timetable</a>
-                            <a class="list-group-item list-group-item-action bg-secondary text-white mt-1"
-                                href="admin?action=load_sample_data">Load Sample Data</a>
+
+                            <!-- Enhanced Timetable Actions -->
+                            <div class="mt-3 mb-2 text-muted small px-3">TIMETABLE ACTIONS</div>
+                            <a class="list-group-item list-group-item-action bg-info text-white"
+                                href="admin?action=load_enhanced_data">📊 Load Sample Data</a>
+                            <a class="list-group-item list-group-item-action bg-primary text-white mt-1"
+                                href="admin?action=generate_enhanced">⚡ Generate Timetable</a>
                             <a class="list-group-item list-group-item-action bg-success text-white mt-1"
-                                href="timetable">View Master Timetable</a>
+                                href="division-timetable">📅 View Timetable</a>
                         </div>
                     </div>
                     <div class="col-md-9">
