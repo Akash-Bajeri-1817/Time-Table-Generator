@@ -1,0 +1,55 @@
+body {
+    background-color: #f8f9fa;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.card {
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    margin-bottom: 20px;
+}
+
+.card-header {
+    background-color: #ffffff;
+    border-bottom: 2px solid #f0f0f0;
+    font-weight: 600;
+}
+
+.timetable-grid {
+    display: grid;
+    grid-template-columns: 100px repeat(6, 1fr); /* Time + 6 Days */
+    gap: 1px;
+    background-color: #dee2e6;
+    border: 1px solid #dee2e6;
+}
+
+.timetable-header, .timetable-cell {
+    background-color: #ffffff;
+    padding: 10px;
+    text-align: center;
+    font-size: 0.9rem;
+}
+
+.timetable-header {
+    background-color: #e9ecef;
+    font-weight: bold;
+}
+
+.timetable-cell.practical {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196f3;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    color: #0d6efd !important;
+}
+
+.btn-primary {
+    background-color: #0d6efd;
+    border: none;
+}
+
+.btn-primary:hover {
+    background-color: #0b5ed7;
+}
