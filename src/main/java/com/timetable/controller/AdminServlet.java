@@ -3,13 +3,21 @@ package com.timetable.controller;
 import java.io.IOException;
 import java.util.List;
 
+import com.timetable.dao.TimetableConfigDao;
 import com.timetable.model.Faculty;
 import com.timetable.model.Room;
 import com.timetable.model.StudentGroup;
 import com.timetable.model.Subject;
+import com.timetable.model.TimetableConfig;
 import com.timetable.model.Workload;
 import com.timetable.service.ResourceService;
 import com.timetable.service.SchedulerService;
+import com.timetable.service.TimeSlotGeneratorService;
+
+import java.time.DayOfWeek;
+import java.time.LocalTime;
+import java.util.HashSet;
+import java.util.Set;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -22,6 +30,8 @@ public class AdminServlet extends HttpServlet {
     private final ResourceService resourceService = new ResourceService();
     private final SchedulerService schedulerService = new SchedulerService();
     private final com.timetable.service.EnhancedSchedulerService enhancedSchedulerService = new com.timetable.service.EnhancedSchedulerService();
+    private final TimetableConfigDao configDao = new TimetableConfigDao();
+    private final TimeSlotGeneratorService slotGeneratorService = new TimeSlotGeneratorService();
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
@@ -78,6 +88,12 @@ public class AdminServlet extends HttpServlet {
                     e.printStackTrace();
                     req.setAttribute("message", "Error during enhanced generation: " + e.getMessage());
                 }
+            } else if ("configure_timeslots".equals(action)) {
+                // Forward to time slot configuration page
+                TimetableConfig activeConfig = configDao.getActiveConfig();
+                req.setAttribute("activeConfig", activeConfig);
+                req.getRequestDispatcher("admin/timeslot_config.jsp").forward(req, resp);
+                return;
             }
 
             // Default: Load Dashboard Data
@@ -142,6 +158,51 @@ public class AdminServlet extends HttpServlet {
         } else if ("generate".equals(action)) {
             boolean success = schedulerService.generateTimetable();
             req.setAttribute("message", success ? "Timetable Generated Successfully!" : "Generation Failed!");
+        } else if ("save_timeslot_config".equals(action)) {
+            try {
+                String startTimeStr = req.getParameter("startTime");
+                int duration = Integer.parseInt(req.getParameter("duration"));
+                int lecturesPerDay = Integer.parseInt(req.getParameter("lecturesPerDay"));
+                boolean hasBreak = req.getParameter("hasBreak") != null;
+
+                TimetableConfig config = new TimetableConfig();
+                config.setConfigName("Default Config");
+                config.setFirstLectureStartTime(LocalTime.parse(startTimeStr));
+                config.setLectureDurationMinutes(duration);
+                config.setLecturesPerDay(lecturesPerDay);
+                config.setHasBreak(hasBreak);
+
+                if (hasBreak) {
+                    config.setBreakDurationMinutes(Integer.parseInt(req.getParameter("breakDuration")));
+                    config.setBreakAfterLectureNumber(Integer.parseInt(req.getParameter("breakAfter")));
+                }
+
+                Set<DayOfWeek> workingDays = new HashSet<>();
+                if (req.getParameter("monday") != null)
+                    workingDays.add(DayOfWeek.MONDAY);
+                if (req.getParameter("tuesday") != null)
+                    workingDays.add(DayOfWeek.TUESDAY);
+                if (req.getParameter("wednesday") != null)
+                    workingDays.add(DayOfWeek.WEDNESDAY);
+                if (req.getParameter("thursday") != null)
+                    workingDays.add(DayOfWeek.THURSDAY);
+                if (req.getParameter("friday") != null)
+                    workingDays.add(DayOfWeek.FRIDAY);
+                if (req.getParameter("saturday") != null)
+                    workingDays.add(DayOfWeek.SATURDAY);
+                if (req.getParameter("sunday") != null)
+                    workingDays.add(DayOfWeek.SUNDAY);
+                config.setWorkingDaysFromSet(workingDays);
+
+                configDao.saveAsActive(config);
+                boolean success = slotGeneratorService.generateAndSaveTimeSlots(config);
+
+                req.setAttribute("message", success ? "✅ Time slots configured and generated successfully!"
+                        : "❌ Failed to generate time slots!");
+            } catch (Exception e) {
+                e.printStackTrace();
+                req.setAttribute("message", "❌ Error: " + e.getMessage());
+            }
         } else if ("load_sample_data".equals(action)) {
             com.timetable.util.SampleDataInitializer.initialize();
             req.setAttribute("message", "Sample Data Loaded Successfully!");

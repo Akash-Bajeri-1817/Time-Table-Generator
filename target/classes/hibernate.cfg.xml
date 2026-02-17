@@ -37,5 +37,6 @@
         <mapping class="com.timetable.model.Branch"/>
         <mapping class="com.timetable.model.Division"/>
         <mapping class="com.timetable.model.Batch"/>
+        <mapping class="com.timetable.model.TimetableConfig"/>
     </session-factory>
 </hibernate-configuration>

@@ -39,6 +39,9 @@
                                 href="#list-group">Student Groups</a>
                             <a class="list-group-item list-group-item-action" id="list-workload-list"
                                 data-bs-toggle="list" href="#list-workload">Assign Workload</a>
+                            <a class="list-group-item list-group-item-action" id="list-timeslot-list"
+                                data-bs-toggle="list" href="#list-timeslot">⚙️ Configure Time Slots</a>
+
 
                             <!-- Enhanced Timetable Actions -->
                             <div class="mt-3 mb-2 text-muted small px-3">TIMETABLE ACTIONS</div>
@@ -207,12 +210,181 @@
                                 </ul>
                             </div>
 
+                            <!-- TIME SLOT CONFIGURATION TAB -->
+                            <div class="tab-pane fade" id="list-timeslot" role="tabpanel">
+                                <h3>⚙️ Configure Time Slots</h3>
+                                <p class="text-muted">Set up your lecture schedule once and it will apply to the entire
+                                    semester.</p>
+
+                                <form method="post" action="admin" class="mt-4">
+                                    <input type="hidden" name="action" value="save_timeslot_config">
+
+                                    <!-- Basic Settings -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-primary text-white">
+                                            <strong>1️⃣ Basic Time Settings</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label">First Lecture Start Time</label>
+                                                    <input type="time" class="form-control" name="startTime"
+                                                        value="08:45" required>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label">Lecture Duration (minutes)</label>
+                                                    <select class="form-select" name="duration" required>
+                                                        <option value="30">30 minutes</option>
+                                                        <option value="45" selected>45 minutes</option>
+                                                        <option value="60">60 minutes</option>
+                                                        <option value="90">90 minutes</option>
+                                                    </select>
+                                                </div>
+                                                <div class="col-md-4 mb-3">
+                                                    <label class="form-label">Lectures Per Day</label>
+                                                    <select class="form-select" name="lecturesPerDay" required>
+                                                        <option value="3" selected>3 lectures</option>
+                                                        <option value="4">4 lectures</option>
+                                                        <option value="5">5 lectures</option>
+                                                        <option value="6">6 lectures</option>
+                                                        <option value="7">7 lectures</option>
+                                                        <option value="8">8 lectures</option>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Break Configuration -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-success text-white">
+                                            <strong>2️⃣ Break Configuration</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="form-check mb-3">
+                                                <input class="form-check-input" type="checkbox" id="hasBreak"
+                                                    name="hasBreak" checked>
+                                                <label class="form-check-label" for="hasBreak">
+                                                    <strong>Include Break</strong>
+                                                </label>
+                                            </div>
+                                            <div id="breakOptions">
+                                                <div class="row">
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Break Duration (minutes)</label>
+                                                        <select class="form-select" name="breakDuration">
+                                                            <option value="10">10 minutes</option>
+                                                            <option value="15" selected>15 minutes</option>
+                                                            <option value="20">20 minutes</option>
+                                                            <option value="30">30 minutes</option>
+                                                        </select>
+                                                    </div>
+                                                    <div class="col-md-6 mb-3">
+                                                        <label class="form-label">Break After Lecture Number</label>
+                                                        <select class="form-select" name="breakAfter">
+                                                            <option value="1">After 1st lecture</option>
+                                                            <option value="2" selected>After 2nd lecture</option>
+                                                            <option value="3">After 3rd lecture</option>
+                                                            <option value="4">After 4th lecture</option>
+                                                            <option value="5">After 5th lecture</option>
+                                                            <option value="6">After 6th lecture</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Working Days -->
+                                    <div class="card mb-3">
+                                        <div class="card-header bg-info text-white">
+                                            <strong>3️⃣ Working Days</strong>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="row">
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="monday"
+                                                            checked>
+                                                        <label class="form-check-label">Monday</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="tuesday"
+                                                            checked>
+                                                        <label class="form-check-label">Tuesday</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="wednesday"
+                                                            checked>
+                                                        <label class="form-check-label">Wednesday</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="thursday"
+                                                            checked>
+                                                        <label class="form-check-label">Thursday</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 mt-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="friday"
+                                                            checked>
+                                                        <label class="form-check-label">Friday</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 mt-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="saturday"
+                                                            checked>
+                                                        <label class="form-check-label">Saturday</label>
+                                                    </div>
+                                                </div>
+                                                <div class="col-md-3 mt-2">
+                                                    <div class="form-check">
+                                                        <input class="form-check-input" type="checkbox" name="sunday">
+                                                        <label class="form-check-label">Sunday</label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Save Button -->
+                                    <div class="d-grid gap-2">
+                                        <button type="submit" class="btn btn-primary btn-lg">
+                                            💾 Save Configuration & Generate Time Slots
+                                        </button>
+                                    </div>
+                                </form>
+
+                                <!-- Current Configuration Display -->
+                                <div class="card mt-4 bg-light">
+                                    <div class="card-header">
+                                        <strong>✅ Current Active Configuration</strong>
+                                    </div>
+                                    <div class="card-body">
+                                        <p class="text-muted">Configuration will be displayed here after saving.</p>
+                                    </div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
                 </div>
             </div>
 
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+            <script>
+                // Toggle break options
+                document.getElementById('hasBreak').addEventListener('change', function () {
+                    document.getElementById('breakOptions').style.display = this.checked ? 'block' : 'none';
+                });
+            </script>
         </body>
 
         </html>
