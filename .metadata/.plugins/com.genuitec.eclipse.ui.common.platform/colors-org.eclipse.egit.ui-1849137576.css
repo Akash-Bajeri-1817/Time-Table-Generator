@@ -23,15 +23,17 @@
 * other views (#272c30; decimal 39,44,48).
 */
 .MPart Table.org-eclipse-egit-ui-GitHistoryPage {
-background-color: inherit;
+	background-color: inherit;
 }
 
 /* Default for the commit and diff component in the git history view. */
-.MPart ScrolledComposite Composite StyledText.org-eclipse-egit-ui-CommitAndDiffComponent {
-background-color: inherit;
+.MPart ScrolledComposite Composite StyledText.org-eclipse-egit-ui-CommitAndDiffComponent
+	{
+	background-color: inherit;
 }
 
 /* Same for the staged/unstaged tree viewers in the staging view. */
-.MPartStack.active .MPart Form Composite Section Composite Tree.org-eclipse-egit-ui-StagingView {
-background-color: inherit;
+.MPartStack.active .MPart Form Composite Section Composite Tree.org-eclipse-egit-ui-StagingView
+	{
+	background-color: inherit;
 }

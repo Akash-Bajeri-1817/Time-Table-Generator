@@ -1,390 +1,357 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-    <%@ taglib prefix="c" uri="jakarta.tags.core" %>
-        <!DOCTYPE html>
-        <html lang="en">
+	<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+		<!DOCTYPE html>
+		<html class="light" lang="en">
 
-        <head>
-            <meta charset="UTF-8">
-            <title>Admin Dashboard - Timetable Generator</title>
-            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-            <link href="${pageContext.request.contextPath}/css/style.css" rel="stylesheet">
-        </head>
+		<head>
+			<meta charset="utf-8" />
+			<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+			<title>Timetable Admin Dashboard Overview</title>
+			<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+				rel="stylesheet" />
+			<link href="https://fonts.googleapis.com/css2?family=Georgia&display=swap" rel="stylesheet" />
+			<link
+				href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+				rel="stylesheet" />
+			<style>
+				.material-symbols-outlined {
+					font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+				}
+			</style>
+			<script id="tailwind-config">
+				tailwind.config = {
+					darkMode: "class",
+					theme: {
+						extend: {
+							colors: {
+								"primary": "#2D5A27",
+								"background-light": "#F4F1EA",
+								"background-dark": "#171b17",
+								"accent-cream": "#E8F5E9",
+							},
+							fontFamily: {
+								"display": ["Inter", "sans-serif"],
+								"serif": ["Georgia", "serif"]
+							},
+							borderRadius: {
+								"DEFAULT": "0.5rem",
+								"lg": "0.75rem",
+								"xl": "1.5rem",
+								"full": "9999px"
+							},
+						},
+					},
+				}
+			</script>
+			<style>
+				.sidebar-active {
+					background-color: #E8F5E9;
+					border-left: 4px solid #2D5A27;
+				}
 
-        <body>
-            <nav class="navbar navbar-dark bg-primary mb-4">
-                <div class="container">
-                    <a class="navbar-brand" href="#">Admin Dashboard</a>
-                    <a href="../index.jsp" class="btn btn-outline-light btn-sm">Logout</a>
-                </div>
-            </nav>
+				.glass-card {
+					background: rgba(255, 255, 255, 0.9);
+					backdrop-filter: blur(8px);
+				}
+			</style>
+		</head>
 
-            <div class="container">
-                <c:if test="${not empty message}">
-                    <div class="alert alert-info alert-dismissible fade show">
-                        ${message}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                    </div>
-                </c:if>
+		<body class="bg-background-light font-display text-slate-900 overflow-x-hidden">
+			<div class="flex h-screen overflow-hidden">
+				<!-- Sidebar -->
+				<c:set var="currentPage" value="dashboard" />
+				<jsp:include page="_sidebar.jsp" />
 
-                <div class="row">
-                    <div class="col-md-3">
-                        <div class="list-group" id="list-tab" role="tablist">
-                            <a class="list-group-item list-group-item-action active" id="list-faculty-list"
-                                data-bs-toggle="list" href="#list-faculty">Manage Faculty</a>
-                            <a class="list-group-item list-group-item-action" id="list-subject-list"
-                                data-bs-toggle="list" href="#list-subject">Manage Subjects</a>
-                            <a class="list-group-item list-group-item-action" id="list-room-list" data-bs-toggle="list"
-                                href="#list-room">Manage Rooms</a>
-                            <a class="list-group-item list-group-item-action" id="list-group-list" data-bs-toggle="list"
-                                href="#list-group">Student Groups</a>
-                            <a class="list-group-item list-group-item-action" id="list-workload-list"
-                                data-bs-toggle="list" href="#list-workload">Assign Workload</a>
-                            <a class="list-group-item list-group-item-action" id="list-timeslot-list"
-                                data-bs-toggle="list" href="#list-timeslot">⚙️ Configure Time Slots</a>
+				<!-- Main Content Area -->
+				<main class="flex-1 flex flex-col overflow-y-auto">
+					<!-- Top Bar -->
+					<header
+						class="h-20 bg-white border-b border-primary/10 flex items-center justify-between px-8 shrink-0">
+						<div class="flex items-center gap-2 text-sm text-slate-500">
+							<a class="hover:text-primary" href="#">Admin</a>
+							<span class="material-symbols-outlined text-xs">chevron_right</span>
+							<span class="text-primary font-medium">Dashboard</span>
+						</div>
+						<div class="flex-1 max-w-2xl px-12">
+							<div class="relative group">
+								<span
+									class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary">search</span>
+								<input
+									class="w-full h-11 bg-background-light border-none rounded-xl pl-12 pr-4 focus:ring-2 focus:ring-primary/20 text-sm placeholder:text-slate-400"
+									placeholder="Search for faculty, rooms, or schedules..." type="text" />
+							</div>
+						</div>
+						<div class="flex items-center gap-6">
+							<button class="relative p-2 text-slate-500 hover:bg-primary/5 rounded-lg transition-colors">
+								<span class="material-symbols-outlined">notifications</span>
+								<span
+									class="absolute top-1 right-1 size-4 bg-red-500 text-[10px] text-white flex items-center justify-center rounded-full border-2 border-white">3</span>
+							</button>
+							<div class="h-8 w-px bg-slate-200"></div>
+							<div class="flex items-center gap-3 cursor-pointer">
+								<div class="text-right hidden xl:block">
+									<p class="text-xs font-bold text-slate-900">Admin User</p>
+									<p class="text-[10px] text-slate-500 uppercase tracking-tight">Active Session</p>
+								</div>
+								<div class="size-10 rounded-lg bg-primary/20 bg-cover bg-center"
+									data-alt="Profile picture of an admin user"
+									style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCh5jObjTnrsd0rQlWAhK9MZZLFc7EmIUk2llwkdXWBVtNclEyvL4gh36xtip4Vh_6u8Vtcozqgja19yYqLGkuElNg0Ul7uYbLQ68wVYhFTVwV-41u2YuSfU6qAN9ChaRhQoT9nIxrCWCVzDMCSOY0lyA3rSEF_sbZBOVHt2DYCMqKuWdwpMLdRs9WvYt57EE9q0ldtbkFzYOQEWc-3Mu48dDHGkpwnq34HxeQjh7MUFsw0yfgkxprmlPsp2I7Sbi747jnI2cvS-vUW')">
+								</div>
+							</div>
+						</div>
+					</header>
 
+					<!-- Dashboard Content -->
+					<div class="p-8 space-y-8">
 
-                            <!-- Enhanced Timetable Actions -->
-                            <div class="mt-3 mb-2 text-muted small px-3">TIMETABLE ACTIONS</div>
-                            <a class="list-group-item list-group-item-action bg-info text-white"
-                                href="admin?action=load_enhanced_data">📊 Load Sample Data</a>
-                            <a class="list-group-item list-group-item-action bg-primary text-white mt-1"
-                                href="admin?action=generate_enhanced">⚡ Generate Timetable</a>
-                            <a class="list-group-item list-group-item-action bg-success text-white mt-1"
-                                href="division-timetable">📅 View Timetable</a>
-                        </div>
-                    </div>
-                    <div class="col-md-9">
-                        <div class="tab-content" id="nav-tabContent">
+						<c:if test="${not empty message}">
+							<div
+								class="bg-primary/10 border border-primary/20 text-primary px-5 py-3 rounded-lg text-sm font-medium mb-4">
+								${message}
+							</div>
+						</c:if>
 
-                            <!-- FACULTY TAB -->
-                            <div class="tab-pane fade show active" id="list-faculty" role="tabpanel">
-                                <h3>Add Faculty</h3>
-                                <form action="admin" method="post" class="card p-3 bg-light">
-                                    <input type="hidden" name="action" value="add_faculty">
-                                    <div class="row g-3">
-                                        <div class="col-md-4"><input type="text" name="name" class="form-control"
-                                                placeholder="Name" required></div>
-                                        <div class="col-md-4"><input type="email" name="email" class="form-control"
-                                                placeholder="Email" required></div>
-                                        <div class="col-md-4"><input type="text" name="department" class="form-control"
-                                                placeholder="Department" required></div>
-                                        <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add
-                                                Faculty</button></div>
-                                    </div>
-                                </form>
-                                <h4 class="mt-4">Existing Faculty</h4>
-                                <ul class="list-group">
-                                    <c:forEach var="f" items="${faculties}">
-                                        <li class="list-group-item">${f.name} (${f.department})</li>
-                                    </c:forEach>
-                                </ul>
-                            </div>
+						<!-- KPI Hero Section -->
+						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
+								<span class="text-slate-500 text-sm font-medium mb-1">Active Groups</span>
+								<div class="flex items-baseline gap-2">
+									<span class="text-3xl font-bold text-primary font-serif">${empty groups ? '0' :
+										groups.size()}</span>
+									<span class="text-xs text-green-600 font-medium">Live</span>
+								</div>
+							</div>
+							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
+								<span class="text-slate-500 text-sm font-medium mb-1">Total Faculty</span>
+								<div class="flex items-baseline gap-2">
+									<span class="text-3xl font-bold text-primary font-serif">${empty faculties ? '0' :
+										faculties.size()}</span>
+									<span class="text-xs text-slate-400 font-medium">Profiles</span>
+								</div>
+							</div>
+							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
+								<span class="text-slate-500 text-sm font-medium mb-1">Courses</span>
+								<div class="flex items-baseline gap-2">
+									<span class="text-3xl font-bold text-primary font-serif">${empty subjects ? '0' :
+										subjects.size()}</span>
+									<span class="text-xs text-green-600 font-medium">Active</span>
+								</div>
+							</div>
+							<div
+								class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col relative overflow-hidden group">
+								<div class="absolute inset-0 bg-red-500/5 group-hover:bg-red-500/10 transition-colors">
+								</div>
+								<span class="text-slate-500 text-sm font-medium mb-1 z-10">Workloads</span>
+								<div class="flex items-baseline gap-2 z-10">
+									<span class="text-3xl font-bold text-primary font-serif">${empty workloads ? '0' :
+										workloads.size()}</span>
+									<span class="text-xs text-primary font-medium">Assigned</span>
+								</div>
+							</div>
+						</div>
 
-                            <!-- SUBJECT TAB -->
-                            <div class="tab-pane fade" id="list-subject" role="tabpanel">
-                                <h3>Add Subject</h3>
-                                <form action="admin" method="post" class="card p-3 bg-light">
-                                    <input type="hidden" name="action" value="add_subject">
-                                    <div class="row g-3">
-                                        <div class="col-md-2"><input type="text" name="code" class="form-control"
-                                                placeholder="Code" required></div>
-                                        <div class="col-md-4"><input type="text" name="name" class="form-control"
-                                                placeholder="Subject Name" required></div>
-                                        <div class="col-md-3"><input type="number" name="lectures" class="form-control"
-                                                placeholder="Lectures/Week" required></div>
-                                        <div class="col-md-3">
-                                            <div class="form-check pt-2">
-                                                <input class="form-check-input" type="checkbox" name="isPractical"
-                                                    id="isPractical">
-                                                <label class="form-check-label" for="isPractical">Is Practical</label>
-                                            </div>
-                                        </div>
-                                        <div class="col-md-4"><input type="text" name="department" class="form-control"
-                                                placeholder="Department" required></div>
-                                        <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add
-                                                Subject</button></div>
-                                    </div>
-                                </form>
-                                <h4 class="mt-4">Existing Subjects</h4>
-                                <ul class="list-group">
-                                    <c:forEach var="s" items="${subjects}">
-                                        <li class="list-group-item">${s.code} - ${s.name} (${s.lecturesPerWeek} lec/wk)
-                                            <c:if test="${s.practical}"><span class="badge bg-info">Practical</span>
-                                            </c:if>
-                                        </li>
-                                    </c:forEach>
-                                </ul>
-                            </div>
+						<!-- Action Shortcuts -->
+						<div class="flex flex-wrap items-center gap-4">
+							<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
+								class="bg-gradient-to-r from-primary to-[#4A7D41] text-white px-6 py-3 rounded-lg font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+								<span class="material-symbols-outlined text-lg">auto_awesome</span>
+								Generate AI Timetable
+							</a>
+							<a href="${pageContext.request.contextPath}/admin?action=load_sample_data"
+								class="bg-white text-primary border border-primary/20 px-6 py-3 rounded-lg font-bold text-sm hover:bg-primary/5 transition-all flex items-center gap-2">
+								<span class="material-symbols-outlined text-lg">database</span>
+								Load Sample Data
+							</a>
+							<a href="${pageContext.request.contextPath}/admin?page=timetable"
+								class="bg-white text-slate-600 border border-slate-200 px-6 py-3 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
+								<span class="material-symbols-outlined text-lg">calendar_view_week</span>
+								View Timetable
+							</a>
+							<a href="${pageContext.request.contextPath}/admin?action=clear_all_data"
+								onclick="return confirm('⚠️ Are you sure you want to clear ALL data?\n\nThis will permanently delete all faculty, subjects, rooms, workloads, timeslots, and schedules from the database.\n\nThis action cannot be undone.')"
+								class="bg-red-50 text-red-700 border border-red-200 px-6 py-3 rounded-lg font-bold text-sm hover:bg-red-100 hover:border-red-300 transition-all flex items-center gap-2">
+								<span class="material-symbols-outlined text-lg">delete_sweep</span>
+								Clear All Data
+							</a>
+						</div>
 
-                            <!-- ROOM TAB -->
-                            <div class="tab-pane fade" id="list-room" role="tabpanel">
-                                <h3>Add Room</h3>
-                                <form action="admin" method="post" class="card p-3 bg-light">
-                                    <input type="hidden" name="action" value="add_room">
-                                    <div class="row g-3">
-                                        <div class="col-md-5"><input type="text" name="name" class="form-control"
-                                                placeholder="Room Name/Number" required></div>
-                                        <div class="col-md-3"><input type="number" name="capacity" class="form-control"
-                                                placeholder="Capacity" required></div>
-                                        <div class="col-md-4">
-                                            <select name="type" class="form-select">
-                                                <option value="CLASSROOM">Classroom</option>
-                                                <option value="LAB">Lab</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add
-                                                Room</button></div>
-                                    </div>
-                                </form>
-                                <h4 class="mt-4">Existing Rooms</h4>
-                                <ul class="list-group">
-                                    <c:forEach var="r" items="${rooms}">
-                                        <li class="list-group-item">${r.name} - ${r.type} (Cap: ${r.capacity})</li>
-                                    </c:forEach>
-                                </ul>
-                            </div>
+						<!-- Main Visuals Grid -->
+						<div class="grid grid-cols-1 lg:grid-cols-10 gap-8">
+							<!-- Schedule Efficiency Area Chart -->
+							<div class="lg:col-span-7 bg-white p-8 rounded-lg shadow-sm border border-primary/5">
+								<div class="flex items-center justify-between mb-8">
+									<div>
+										<h3 class="font-serif text-xl font-bold text-slate-800">Recent Schedules</h3>
+										<p class="text-sm text-slate-500">Overview of generated schedules</p>
+									</div>
+								</div>
 
-                            <!-- GROUP TAB -->
-                            <div class="tab-pane fade" id="list-group" role="tabpanel">
-                                <h3>Add Student Group</h3>
-                                <form action="admin" method="post" class="card p-3 bg-light">
-                                    <input type="hidden" name="action" value="add_group">
-                                    <div class="row g-3">
-                                        <div class="col-md-8"><input type="text" name="name" class="form-control"
-                                                placeholder="Group Name (e.g. TY BSc CS - Div A)" required></div>
-                                        <div class="col-12"><button type="submit" class="btn btn-primary w-100">Add
-                                                Group</button></div>
-                                    </div>
-                                </form>
-                                <h4 class="mt-4">Existing Groups</h4>
-                                <ul class="list-group">
-                                    <c:forEach var="g" items="${groups}">
-                                        <li class="list-group-item">${g.name}</li>
-                                    </c:forEach>
-                                </ul>
-                            </div>
+								<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+									<c:forEach var="g" items="${groups}">
+										<div
+											class="bg-background-light p-4 rounded-lg border border-primary/10 hover:border-primary/30 transition-all">
+											<div class="flex justify-between items-start mb-2">
+												<h4 class="font-bold text-primary">${g.name}</h4>
+												<span
+													class="px-2 py-0.5 bg-primary/10 text-primary text-[10px] font-bold rounded-full uppercase">Active</span>
+											</div>
+											<div class="text-xs text-slate-500 mb-4 flex items-center gap-1">
+												<span class="material-symbols-outlined text-sm">schedule</span>
+												Auto-generated
+											</div>
+											<div class="flex gap-2">
+												<a href="${pageContext.request.contextPath}/admin?page=timetable"
+													class="text-xs font-bold text-primary hover:underline">View
+													Details</a>
+											</div>
+										</div>
+									</c:forEach>
 
-                            <!-- WORKLOAD TAB -->
-                            <div class="tab-pane fade" id="list-workload" role="tabpanel">
-                                <h3>Assign Workload</h3>
-                                <form action="admin" method="post" class="card p-3 bg-light">
-                                    <input type="hidden" name="action" value="add_workload">
-                                    <div class="row g-3">
-                                        <div class="col-md-4">
-                                            <label>Faculty</label>
-                                            <select name="faculty_id" class="form-select">
-                                                <c:forEach var="f" items="${faculties}">
-                                                    <option value="${f.id}">${f.name}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>Subject</label>
-                                            <select name="subject_id" class="form-select">
-                                                <c:forEach var="s" items="${subjects}">
-                                                    <option value="${s.id}">${s.name} (${s.code})</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                        <div class="col-md-4">
-                                            <label>Class/Group</label>
-                                            <select name="group_id" class="form-select">
-                                                <c:forEach var="g" items="${groups}">
-                                                    <option value="${g.id}">${g.name}</option>
-                                                </c:forEach>
-                                            </select>
-                                        </div>
-                                        <div class="col-12"><button type="submit"
-                                                class="btn btn-primary w-100">Assign</button></div>
-                                    </div>
-                                </form>
-                                <h4 class="mt-4">Current Assignments</h4>
-                                <ul class="list-group">
-                                    <c:forEach var="w" items="${workloads}">
-                                        <li class="list-group-item">
-                                            <strong>${w.faculty.name}</strong> teaches
-                                            <strong>${w.subject.name}</strong> to
-                                            <strong>${w.studentGroup.name}</strong>
-                                        </li>
-                                    </c:forEach>
-                                </ul>
-                            </div>
+									<c:if test="${empty groups}">
+										<div
+											class="col-span-full border-2 border-dashed border-slate-200 p-8 text-center rounded-lg">
+											<div
+												class="size-12 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-3 text-slate-400">
+												<span class="material-symbols-outlined text-2xl">event_busy</span>
+											</div>
+											<p class="text-slate-600 font-medium mb-1">No schedules generated yet.</p>
+											<p class="text-xs text-slate-400">Load demo data or use the generate button
+												to start.</p>
+										</div>
+									</c:if>
+								</div>
 
-                            <!-- TIME SLOT CONFIGURATION TAB -->
-                            <div class="tab-pane fade" id="list-timeslot" role="tabpanel">
-                                <h3>⚙️ Configure Time Slots</h3>
-                                <p class="text-muted">Set up your lecture schedule once and it will apply to the entire
-                                    semester.</p>
+							</div>
 
-                                <form method="post" action="admin" class="mt-4">
-                                    <input type="hidden" name="action" value="save_timeslot_config">
+							<!-- Recent Activity -->
+							<div
+								class="lg:col-span-3 bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
+								<h3 class="font-serif text-xl font-bold text-slate-800 mb-6">Recent Activity</h3>
+								<div class="flex-1 space-y-6 overflow-y-auto pr-2">
+									<div class="flex gap-4 relative">
+										<div class="absolute left-3.5 top-8 bottom-[-16px] w-px bg-slate-100"></div>
+										<div
+											class="size-7 rounded-full bg-primary/10 flex items-center justify-center shrink-0 z-10">
+											<span
+												class="material-symbols-outlined text-primary text-sm">auto_awesome</span>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-slate-800 leading-snug">Timetable
+												generated for CS</p>
+											<p class="text-xs text-slate-400 mt-1">10 minutes ago</p>
+										</div>
+									</div>
+									<div class="flex gap-4 relative">
+										<div class="absolute left-3.5 top-8 bottom-[-16px] w-px bg-slate-100"></div>
+										<div
+											class="size-7 rounded-full bg-amber-500/10 flex items-center justify-center shrink-0 z-10">
+											<span
+												class="material-symbols-outlined text-amber-600 text-sm">person_off</span>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-slate-800 leading-snug">Dr. Kumar marked
+												as On Leave</p>
+											<p class="text-xs text-slate-400 mt-1">2 hours ago</p>
+										</div>
+									</div>
+									<div class="flex gap-4">
+										<div
+											class="size-7 rounded-full bg-green-500/10 flex items-center justify-center shrink-0 z-10">
+											<span
+												class="material-symbols-outlined text-green-600 text-sm">check_circle</span>
+										</div>
+										<div>
+											<p class="text-sm font-medium text-slate-800 leading-snug">Room 102 conflict
+												resolved</p>
+											<p class="text-xs text-slate-400 mt-1">Yesterday</p>
+										</div>
+									</div>
+								</div>
+								<button class="mt-6 text-xs font-bold text-primary hover:underline self-center">View
+									Full Audit Log</button>
+							</div>
+						</div>
 
-                                    <!-- Basic Settings -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-primary text-white">
-                                            <strong>1️⃣ Basic Time Settings</strong>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-4 mb-3">
-                                                    <label class="form-label">First Lecture Start Time</label>
-                                                    <input type="time" class="form-control" name="startTime"
-                                                        value="08:45" required>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label class="form-label">Lecture Duration (minutes)</label>
-                                                    <select class="form-select" name="duration" required>
-                                                        <option value="30">30 minutes</option>
-                                                        <option value="45" selected>45 minutes</option>
-                                                        <option value="60">60 minutes</option>
-                                                        <option value="90">90 minutes</option>
-                                                    </select>
-                                                </div>
-                                                <div class="col-md-4 mb-3">
-                                                    <label class="form-label">Lectures Per Day</label>
-                                                    <select class="form-select" name="lecturesPerDay" required>
-                                                        <option value="3" selected>3 lectures</option>
-                                                        <option value="4">4 lectures</option>
-                                                        <option value="5">5 lectures</option>
-                                                        <option value="6">6 lectures</option>
-                                                        <option value="7">7 lectures</option>
-                                                        <option value="8">8 lectures</option>
-                                                    </select>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+						<!-- Lower Grid -->
+						<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+							<!-- Upcoming Lectures Table -->
+							<div
+								class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-primary/5 overflow-hidden">
+								<div class="px-6 py-4 border-b border-primary/5 flex items-center justify-between">
+									<h3 class="font-serif text-xl font-bold text-slate-800">Sample Assigned Workloads
+									</h3>
+									<button class="text-xs font-bold text-slate-500 hover:text-primary">See All</button>
+								</div>
+								<div class="overflow-x-auto">
+									<table class="w-full text-left">
+										<thead
+											class="bg-background-light/50 text-[10px] uppercase text-slate-500 font-bold">
+											<tr>
+												<th class="px-6 py-3">Group</th>
+												<th class="px-6 py-3">Subject</th>
+												<th class="px-6 py-3">Faculty</th>
+											</tr>
+										</thead>
+										<tbody class="divide-y divide-slate-50">
+											<c:forEach var="w" items="${workloads}" begin="0" end="4">
+												<tr class="hover:bg-primary/5 transition-colors">
+													<td class="px-6 py-4">
+														<p class="text-sm font-semibold">${w.studentGroup.name}</p>
+													</td>
+													<td class="px-6 py-4">
+														<p class="text-sm text-slate-600">${w.subject.name}</p>
+														<p class="text-[10px] text-slate-400">${w.subject.code}</p>
+													</td>
+													<td class="px-6 py-4">
+														<span
+															class="px-2 py-1 bg-primary/10 text-primary text-xs font-bold rounded">${w.faculty.name}</span>
+													</td>
+												</tr>
+											</c:forEach>
+										</tbody>
+									</table>
+								</div>
+							</div>
 
-                                    <!-- Break Configuration -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-success text-white">
-                                            <strong>2️⃣ Break Configuration</strong>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="form-check mb-3">
-                                                <input class="form-check-input" type="checkbox" id="hasBreak"
-                                                    name="hasBreak" checked>
-                                                <label class="form-check-label" for="hasBreak">
-                                                    <strong>Include Break</strong>
-                                                </label>
-                                            </div>
-                                            <div id="breakOptions">
-                                                <div class="row">
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Break Duration (minutes)</label>
-                                                        <select class="form-select" name="breakDuration">
-                                                            <option value="10">10 minutes</option>
-                                                            <option value="15" selected>15 minutes</option>
-                                                            <option value="20">20 minutes</option>
-                                                            <option value="30">30 minutes</option>
-                                                        </select>
-                                                    </div>
-                                                    <div class="col-md-6 mb-3">
-                                                        <label class="form-label">Break After Lecture Number</label>
-                                                        <select class="form-select" name="breakAfter">
-                                                            <option value="1">After 1st lecture</option>
-                                                            <option value="2" selected>After 2nd lecture</option>
-                                                            <option value="3">After 3rd lecture</option>
-                                                            <option value="4">After 4th lecture</option>
-                                                            <option value="5">After 5th lecture</option>
-                                                            <option value="6">After 6th lecture</option>
-                                                        </select>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+							<!-- System Health -->
+							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5">
+								<h3 class="font-serif text-xl font-bold text-slate-800 mb-6">System Health</h3>
+								<div class="space-y-6">
+									<div>
+										<div class="flex justify-between text-xs font-bold mb-2">
+											<span class="text-slate-500">Server Status</span>
+											<span class="text-green-600">Operational</span>
+										</div>
+										<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+											<div class="bg-green-500 h-full w-[98%]"></div>
+										</div>
+									</div>
+									<div>
+										<div class="flex justify-between text-xs font-bold mb-2">
+											<span class="text-slate-500">Algorithm Status</span>
+											<span class="text-primary">Ready</span>
+										</div>
+										<div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden">
+											<div class="bg-primary h-full w-[100%]"></div>
+										</div>
+									</div>
+								</div>
+								<div class="mt-8 p-4 bg-primary/5 rounded-lg border border-primary/10">
+									<div class="flex items-center gap-3">
+										<span class="material-symbols-outlined text-primary">cloud_done</span>
+										<div>
+											<p class="text-xs font-bold text-primary">Data Source</p>
+											<p class="text-[10px] text-slate-500">Connected to Timefold AI</p>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
 
-                                    <!-- Working Days -->
-                                    <div class="card mb-3">
-                                        <div class="card-header bg-info text-white">
-                                            <strong>3️⃣ Working Days</strong>
-                                        </div>
-                                        <div class="card-body">
-                                            <div class="row">
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="monday"
-                                                            checked>
-                                                        <label class="form-check-label">Monday</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="tuesday"
-                                                            checked>
-                                                        <label class="form-check-label">Tuesday</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="wednesday"
-                                                            checked>
-                                                        <label class="form-check-label">Wednesday</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="thursday"
-                                                            checked>
-                                                        <label class="form-check-label">Thursday</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3 mt-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="friday"
-                                                            checked>
-                                                        <label class="form-check-label">Friday</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3 mt-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="saturday"
-                                                            checked>
-                                                        <label class="form-check-label">Saturday</label>
-                                                    </div>
-                                                </div>
-                                                <div class="col-md-3 mt-2">
-                                                    <div class="form-check">
-                                                        <input class="form-check-input" type="checkbox" name="sunday">
-                                                        <label class="form-check-label">Sunday</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
+					</div>
+				</main>
+			</div>
+		</body>
 
-                                    <!-- Save Button -->
-                                    <div class="d-grid gap-2">
-                                        <button type="submit" class="btn btn-primary btn-lg">
-                                            💾 Save Configuration & Generate Time Slots
-                                        </button>
-                                    </div>
-                                </form>
-
-                                <!-- Current Configuration Display -->
-                                <div class="card mt-4 bg-light">
-                                    <div class="card-header">
-                                        <strong>✅ Current Active Configuration</strong>
-                                    </div>
-                                    <div class="card-body">
-                                        <p class="text-muted">Configuration will be displayed here after saving.</p>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
-            <script>
-                // Toggle break options
-                document.getElementById('hasBreak').addEventListener('change', function () {
-                    document.getElementById('breakOptions').style.display = this.checked ? 'block' : 'none';
-                });
-            </script>
-        </body>
-
-        </html>
+		</html>

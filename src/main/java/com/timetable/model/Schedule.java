@@ -1,16 +1,21 @@
 package com.timetable.model;
 
+import ai.timefold.solver.core.api.domain.entity.PlanningEntity;
+import ai.timefold.solver.core.api.domain.lookup.PlanningId;
+import ai.timefold.solver.core.api.domain.variable.PlanningVariable;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 
+@PlanningEntity
 @Entity
 @Table(name = "schedules")
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class Schedule {
+    @PlanningId
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -19,12 +24,13 @@ public class Schedule {
     @JoinColumn(name = "workload_id", nullable = false)
     private Workload workload;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "room_id", nullable = false)
+    @ManyToOne
+    @JoinColumn(name = "room_id")
     private Room room;
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "timeslot_id", nullable = false)
+    @PlanningVariable(valueRangeProviderRefs = "timeSlotRange")
+    @ManyToOne
+    @JoinColumn(name = "timeslot_id")
     private TimeSlot timeSlot;
 
     @ManyToOne
