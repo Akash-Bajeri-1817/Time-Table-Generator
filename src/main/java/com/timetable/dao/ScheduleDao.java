@@ -47,4 +47,26 @@ public class ScheduleDao extends GenericDao<Schedule> {
             e.printStackTrace();
         }
     }
+
+    public List<Schedule> findByFacultyId(Long facultyId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Schedule s WHERE s.workload.faculty.id = :facultyId", Schedule.class)
+                    .setParameter("facultyId", facultyId)
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
+
+    public List<Schedule> findByStudentGroupId(Long groupId) {
+        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
+            return session.createQuery("FROM Schedule s WHERE s.workload.studentGroup.id = :groupId", Schedule.class)
+                    .setParameter("groupId", groupId)
+                    .list();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return List.of();
+        }
+    }
 }

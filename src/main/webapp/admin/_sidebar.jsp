@@ -134,9 +134,9 @@
                 </nav>
             </div>
 
-            <!-- User Profile -->
+            <!-- User Profile + Logout -->
             <div class="p-6 border-t border-slate-100">
-                <div class="flex items-center gap-3 px-2">
+                <div class="flex items-center gap-3 px-2 mb-4">
                     <div
                         class="size-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold text-sm">
                         AD</div>
@@ -145,5 +145,11 @@
                         <span class="text-xs text-slate-500">Super Administrator</span>
                     </div>
                 </div>
+                <a href="${pageContext.request.contextPath}/admin?action=logout"
+                    class="flex items-center gap-3 px-4 py-2.5 rounded-lg text-red-600 hover:bg-red-50 transition-colors font-medium w-full group">
+                    <span
+                        class="material-symbols-outlined text-xl group-hover:scale-110 transition-transform">logout</span>
+                    <span class="text-sm">Logout</span>
+                </a>
             </div>
         </aside>

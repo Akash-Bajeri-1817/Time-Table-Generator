@@ -40,7 +40,11 @@ public class AdminServlet extends HttpServlet {
             String page = req.getParameter("page");
 
             // ─── ACTIONS ───────────────────────────────────────────
-            if ("generate_ai".equals(action)) {
+            if ("logout".equals(action)) {
+                req.getSession().invalidate();
+                resp.sendRedirect(req.getContextPath() + "/");
+                return;
+            } else if ("generate_ai".equals(action)) {
                 System.out.println("=== AI TIMETABLE GENERATION (TIMEFOLD) TRIGGERED ===");
                 try {
                     boolean success = aiSchedulerService.generateTimetable();

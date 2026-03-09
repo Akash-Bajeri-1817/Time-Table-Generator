@@ -16,7 +16,9 @@
 						href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
 						rel="stylesheet" />
 					<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-					<script>tailwind.config = { theme: { extend: { colors: { primary: "#2D5A27", "primary-light": "#E8F5E9", "background-light": "#F4F1EA", "text-header": "#111827", "text-body": "#4B5563", "border-color": "#E5E7EB" }, fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] } } } }}</script>
+					<script
+						src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+					<script>tailwind.config = { theme: { extend: { colors: { primary: "#2D5A27", "primary-light": "#E8F5E9", "background-light": "#F4F1EA", "text-header": "#111827", "text-body": "#4B5563", "border-color": "#E5E7EB" }, fontFamily: { sans: ['Inter', 'sans-serif'], serif: ['Playfair Display', 'serif'] } } } }</script>
 					<style>
 						.material-symbols-outlined {
 							font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24
@@ -71,6 +73,10 @@
 								<span class="text-sm bg-primary-light px-3 py-1 rounded-full font-medium text-primary">
 									<span id="lectureCount">${schedules.size()}</span> lectures
 								</span>
+								<button onclick="exportPDF()"
+									class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors">
+									<span class="material-symbols-outlined text-lg">download</span> Export PDF
+								</button>
 								<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
 									class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg shadow-sm hover:bg-primary/90 font-medium text-sm transition-colors">
 									<span class="material-symbols-outlined text-lg">auto_awesome</span>
@@ -227,8 +233,8 @@
 																			</div>
 
 																			<%-- Grid --%>
-																				<div
-																					class="overflow-auto rounded-xl border border-border-color shadow-sm">
+																				<div id="timetableGridContainer"
+																					class="overflow-auto rounded-xl border border-border-color shadow-sm bg-white p-2">
 																					<table
 																						class="w-full border-collapse bg-white text-xs"
 																						style="min-width:960px;">
@@ -394,6 +400,23 @@
 								if (match) shown++;
 							});
 							document.getElementById('lectureCount').textContent = shown;
+						}
+
+						function exportPDF() {
+							var element = document.getElementById('timetableGridContainer');
+							var activeTabBtn = document.querySelector('.tab-btn.active');
+							var activeTab = activeTabBtn ? activeTabBtn.textContent.trim().replace(/[^a-zA-Z0-9 ]/g, '') : 'All_Divisions';
+							var filename = 'Timetable_' + activeTab.replace(/\s+/g, '_') + '.pdf';
+
+							var opt = {
+								margin: 0.3,
+								filename: filename,
+								image: { type: 'jpeg', quality: 0.98 },
+								html2canvas: { scale: 2, useCORS: true },
+								jsPDF: { unit: 'in', format: 'a4', orientation: 'landscape' }
+							};
+
+							html2pdf().set(opt).from(element).save();
 						}
 					</script>
 				</body>
