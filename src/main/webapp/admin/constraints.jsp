@@ -97,6 +97,19 @@
                                     class="p-6 space-y-6">
                                     <input type="hidden" name="action" value="save_timeslot_config" />
 
+                                    <!-- Year Level -->
+                                    <div class="mb-4">
+                                        <label class="block text-sm font-semibold text-text-header mb-1.5"
+                                            for="yearLevel">Select Year Level *</label>
+                                        <select id="yearLevel" name="yearLevel" required
+                                            class="w-full md:w-1/3 px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                            <option value="FY" ${not empty activeConfig && activeConfig.yearLevel == 'FY' ? 'selected' : ''}>First Year (FY)</option>
+                                            <option value="SY" ${not empty activeConfig && activeConfig.yearLevel == 'SY' ? 'selected' : ''}>Second Year (SY)</option>
+                                            <option value="TY" ${not empty activeConfig && activeConfig.yearLevel == 'TY' ? 'selected' : ''}>Third Year (TY)</option>
+                                        </select>
+                                        <p class="text-xs text-text-body mt-1">These constraints will only apply to workloads for this specific year.</p>
+                                    </div>
+
                                     <!-- Working Days -->
                                     <div>
                                         <label class="block text-sm font-semibold text-text-header mb-3">Working Days

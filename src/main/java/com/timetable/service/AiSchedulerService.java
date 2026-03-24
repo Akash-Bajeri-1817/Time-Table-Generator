@@ -92,28 +92,34 @@ public class AiSchedulerService {
                         //
                         // Division.classroom stores a room identifier like "206".
                         // Room.name stores "Room 206". We match by checking if name contains
-                        // the division's classroom string.
-                        // Fallback: first CLASSROOM room in the list.
                         Map<Long, Room> divisionRoomMap = new HashMap<>();
-                        Room fallbackRoom = rooms.get(0);
+                        Room fallbackRoom = rooms.isEmpty() ? null : rooms.get(0);
 
-                        for (Workload w : workloads) {
+                        if (!rooms.isEmpty()) {
+                            for (Workload w : workloads) {
                                 Division div = w.getDivision();
                                 if (div == null || divisionRoomMap.containsKey(div.getId()))
-                                        continue;
+                                    continue;
 
                                 Room matched = fallbackRoom;
-                                if (div.getClassroom() != null && !div.getClassroom().isEmpty()) {
-                                        for (Room r : rooms) {
-                                                if (r.getName() != null && r.getName().contains(div.getClassroom())) {
-                                                        matched = r;
-                                                        break;
-                                                }
+                                if (div.getClassroom() != null && !div.getClassroom().trim().isEmpty()) {
+                                    String expectedRoomStr = div.getClassroom().trim().toLowerCase();
+                                    for (Room r : rooms) {
+                                        if (r.getName() != null) {
+                                            String actualRoomStr = r.getName().trim().toLowerCase();
+                                            if (actualRoomStr.equals(expectedRoomStr) || 
+                                                actualRoomStr.contains(expectedRoomStr) || 
+                                                expectedRoomStr.contains(actualRoomStr)) {
+                                                matched = r;
+                                                break;
+                                            }
                                         }
+                                    }
                                 }
                                 divisionRoomMap.put(div.getId(), matched);
                                 System.out.println("  [ROOM] Division " + div.getName()
                                                 + " => " + matched.getName() + " (fixed for semester)");
+                            }
                         }
 
                         // ── STEP 3: Clear old schedules ───────────────────────────────────
@@ -179,6 +185,14 @@ public class AiSchedulerService {
                                         + solution.getScore().hardScore()
                                         + " | Soft: " + solution.getScore().softScore());
 
+                        // Prevent DB crash if AI could not find a valid conflict-free timetable
+                        if (solution.getScore().hardScore() < 0) {
+                                System.err.println("[STEP 5] FATAL: AI Solver failed to find a valid conflict-free timetable!");
+                                System.err.println("[STEP 5] You have more workloads assigned to a room/faculty than available time slots.");
+                                System.err.println("[STEP 5] Aborting database save to prevent constraint violations.");
+                                return false;
+                        }
+
                         // ── STEP 6: INSERT only fully-solved schedules as new DB rows ──────
                         //
                         // Create BRAND NEW Schedule objects (id = null) so Hibernate treats
@@ -220,7 +234,7 @@ public class AiSchedulerService {
                                         + " schedule(s). Skipped: " + skippedCount);
                         System.out.println("========== AI TIMETABLE GENERATION COMPLETE ==========\n");
 
-                        return solution.getScore().hardScore() >= 0;
+                        return true;
 
                 } catch (Exception e) {
                         System.err.println("[FATAL] AiSchedulerService.generateTimetable() threw an exception:");

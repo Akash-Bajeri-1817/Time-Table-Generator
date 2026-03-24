@@ -138,8 +138,18 @@
                         <!-- Divisions Table -->
                         <c:if test="${not empty divisions}">
                             <div class="bg-white rounded-xl border border-border-color shadow-sm overflow-hidden">
-                                <div class="px-6 py-4 border-b border-border-color">
+                                <div class="px-6 py-4 border-b border-border-color flex items-center justify-between">
                                     <h2 class="font-semibold text-sm">Divisions from DB</h2>
+                                    <div class="flex gap-2">
+                                        <button onclick="document.getElementById('addBranchModal').classList.remove('hidden')"
+                                            class="flex items-center gap-1 px-3 py-1.5 bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 font-medium text-xs">
+                                            <span class="material-symbols-outlined text-sm">add</span>Add Branch
+                                        </button>
+                                        <button onclick="document.getElementById('addDivisionModal').classList.remove('hidden')"
+                                            class="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 rounded-lg hover:bg-blue-100 font-medium text-xs">
+                                            <span class="material-symbols-outlined text-sm">add</span>Add Division
+                                        </button>
+                                    </div>
                                 </div>
                                 <table class="w-full">
                                     <thead class="bg-gray-50 border-b border-border-color">
@@ -209,6 +219,106 @@
                                 <button type="submit"
                                     class="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90">Create
                                     Group</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Add Branch Modal -->
+                <div id="addBranchModal"
+                    class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                        <div class="flex items-center justify-between p-6 border-b border-border-color">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-lg bg-gray-100 flex items-center justify-center text-gray-700">
+                                    <span class="material-symbols-outlined">account_balance</span>
+                                </div>
+                                <h2 class="text-lg font-bold font-serif">Add Branch</h2>
+                            </div>
+                            <button onclick="document.getElementById('addBranchModal').classList.add('hidden')"
+                                class="p-2 rounded-lg hover:bg-gray-100"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <form method="post" action="${pageContext.request.contextPath}/admin" class="p-6 space-y-4">
+                            <input type="hidden" name="action" value="add_branch" />
+                            
+                            <div><label class="block text-sm font-medium mb-1.5">Branch Code *</label>
+                                <input type="text" name="code" placeholder="e.g. BBA" required
+                                    class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                            </div>
+                            
+                            <div><label class="block text-sm font-medium mb-1.5">Branch Name *</label>
+                                <input type="text" name="name" placeholder="e.g. Bachelor of Business Administration" required
+                                    class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                            </div>
+
+                            <div><label class="block text-sm font-medium mb-1.5">Department Name *</label>
+                                <input type="text" name="department_name" placeholder="e.g. Commerce" required
+                                    class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-4 border-t border-border-color mt-4">
+                                <button type="button" onclick="document.getElementById('addBranchModal').classList.add('hidden')"
+                                    class="px-5 py-2.5 border border-border-color rounded-lg text-sm font-medium text-text-body hover:bg-gray-50">Cancel</button>
+                                <button type="submit" class="px-5 py-2.5 bg-gray-800 text-white rounded-lg text-sm font-medium hover:bg-gray-900">Create Branch</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <!-- Add Division Modal -->
+                <div id="addDivisionModal"
+                    class="hidden fixed inset-0 bg-black/40 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                    <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+                        <div class="flex items-center justify-between p-6 border-b border-border-color">
+                            <div class="flex items-center gap-3">
+                                <div class="size-10 rounded-lg bg-blue-50 flex items-center justify-center text-blue-600">
+                                    <span class="material-symbols-outlined">account_tree</span>
+                                </div>
+                                <h2 class="text-lg font-bold font-serif">Add Division</h2>
+                            </div>
+                            <button onclick="document.getElementById('addDivisionModal').classList.add('hidden')"
+                                class="p-2 rounded-lg hover:bg-gray-100"><span class="material-symbols-outlined">close</span></button>
+                        </div>
+                        <form method="post" action="${pageContext.request.contextPath}/admin" class="p-6 space-y-4">
+                            <input type="hidden" name="action" value="add_division" />
+                            
+                            <div><label class="block text-sm font-medium mb-1.5">Division Name *</label>
+                                <input type="text" name="name" placeholder="e.g. A, B, C" required
+                                    class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                            </div>
+                            
+                            <div><label class="block text-sm font-medium mb-1.5">Year Level *</label>
+                                <select name="year" required class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                    <option value="FY">First Year (FY)</option>
+                                    <option value="SY">Second Year (SY)</option>
+                                    <option value="TY">Third Year (TY)</option>
+                                </select>
+                            </div>
+
+                            <div><label class="block text-sm font-medium mb-1.5">Branch *</label>
+                                <select name="branch_id" required class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                    <option value="">Select Branch</option>
+                                    <c:forEach var="b" items="${branches}">
+                                        <option value="${b.id}">${b.name} (${b.code})</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+
+                            <div class="grid grid-cols-2 gap-4">
+                                <div><label class="block text-sm font-medium mb-1.5">Capacity</label>
+                                    <input type="number" name="capacity" placeholder="e.g. 60"
+                                        class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                                </div>
+                                <div><label class="block text-sm font-medium mb-1.5">Default Room</label>
+                                    <input type="text" name="classroom" placeholder="e.g. Room 101"
+                                        class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20" />
+                                </div>
+                            </div>
+
+                            <div class="flex justify-end gap-3 pt-4 border-t border-border-color mt-4">
+                                <button type="button" onclick="document.getElementById('addDivisionModal').classList.add('hidden')"
+                                    class="px-5 py-2.5 border border-border-color rounded-lg text-sm font-medium text-text-body hover:bg-gray-50">Cancel</button>
+                                <button type="submit" class="px-5 py-2.5 bg-blue-600 text-white rounded-lg text-sm font-medium hover:bg-blue-700">Create Division</button>
                             </div>
                         </form>
                     </div>

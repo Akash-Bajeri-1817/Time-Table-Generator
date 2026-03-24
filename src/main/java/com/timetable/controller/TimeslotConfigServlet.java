@@ -24,7 +24,7 @@ public class TimeslotConfigServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // Get active configuration if exists
-        TimetableConfig activeConfig = configDao.getActiveConfig();
+        TimetableConfig activeConfig = configDao.getActiveConfig(com.timetable.model.YearLevel.FY);
         req.setAttribute("activeConfig", activeConfig);
 
         // Forward to configuration page

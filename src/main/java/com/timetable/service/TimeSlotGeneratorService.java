@@ -31,9 +31,9 @@ public class TimeSlotGeneratorService {
                 return false;
             }
 
-            // Delete all existing theory time slots
-            System.out.println("Deleting existing theory time slots...");
-            deleteExistingTheorySlots();
+            // Delete all existing theory time slots for the specified Year Level
+            System.out.println("Deleting existing theory time slots for YearLevel: " + config.getYearLevel());
+            deleteExistingTheorySlots(config.getYearLevel());
 
             // Generate new time slots
             List<TimeSlot> newSlots = generateTimeSlots(config);
@@ -87,6 +87,7 @@ public class TimeSlotGeneratorService {
                 lecture.setDurationMinutes(config.getLectureDurationMinutes());
                 lecture.setSessionType(SessionType.THEORY);
                 lecture.setIsBreak(false);
+                lecture.setYearLevel(config.getYearLevel());
                 slots.add(lecture);
 
                 // Move to next time
@@ -101,6 +102,7 @@ public class TimeSlotGeneratorService {
                     breakSlot.setDurationMinutes(config.getBreakDurationMinutes());
                     breakSlot.setSessionType(SessionType.THEORY); // Break is still part of theory session
                     breakSlot.setIsBreak(true);
+                    breakSlot.setYearLevel(config.getYearLevel());
                     slots.add(breakSlot);
 
                     // Move time forward by break duration
@@ -113,18 +115,18 @@ public class TimeSlotGeneratorService {
     }
 
     /**
-     * Delete all existing theory time slots
+     * Delete all existing theory time slots for a specific YearLevel
      */
-    private void deleteExistingTheorySlots() {
+    private void deleteExistingTheorySlots(com.timetable.model.YearLevel yearLevel) {
         List<TimeSlot> allSlots = timeSlotDao.findAll();
         int deletedCount = 0;
         for (TimeSlot slot : allSlots) {
-            if (slot.getSessionType() == SessionType.THEORY) {
+            if (slot.getSessionType() == SessionType.THEORY && slot.getYearLevel() == yearLevel) {
                 timeSlotDao.delete(slot.getId());
                 deletedCount++;
             }
         }
-        System.out.println("Deleted " + deletedCount + " existing theory time slots");
+        System.out.println("Deleted " + deletedCount + " existing theory time slots for Year Level: " + yearLevel);
     }
 
     /**

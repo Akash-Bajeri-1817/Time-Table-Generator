@@ -93,6 +93,15 @@ public class AdminServlet extends HttpServlet {
                     req.setAttribute("message", "Error loading enhanced data: " + e.getMessage());
                 }
 
+            } else if ("load_fy_sample_data".equals(action)) {
+                try {
+                    com.timetable.util.FYSampleDataInitializer.initialize();
+                    req.setAttribute("message", "✅ FY BSc CS Sample Data Loaded! (3 Divisions, 2:00 PM start)");
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    req.setAttribute("message", "Error loading FY sample data: " + e.getMessage());
+                }
+
             } else if ("clear_all_data".equals(action)) {
                 try {
                     // Delete in FK-safe order (children first)
@@ -166,7 +175,7 @@ public class AdminServlet extends HttpServlet {
                 page = "workload";
 
             } else if ("configure_timeslots".equals(action)) {
-                TimetableConfig activeConfig = configDao.getActiveConfig();
+                TimetableConfig activeConfig = configDao.getActiveConfig(com.timetable.model.YearLevel.FY);
                 req.setAttribute("activeConfig", activeConfig);
                 req.getRequestDispatcher("admin/timeslot_config.jsp").forward(req, resp);
                 return;
@@ -226,16 +235,71 @@ public class AdminServlet extends HttpServlet {
             req.getSession().setAttribute("flashMessage", "✅ Group \"" + g.getName() + "\" added successfully!");
             redirectPage = "groups";
 
+        } else if ("add_branch".equals(action)) {
+            try {
+                Branch branch = new Branch();
+                branch.setCode(req.getParameter("code"));
+                branch.setName(req.getParameter("name"));
+                branch.setDepartment(req.getParameter("department_name"));
+                
+                com.timetable.dao.BranchDao branchDao = new com.timetable.dao.BranchDao();
+                branchDao.save(branch);
+                req.getSession().setAttribute("flashMessage", "✅ Branch \"" + branch.getName() + "\" added successfully!");
+            } catch (Exception e) {
+                req.getSession().setAttribute("flashMessage", "❌ Error creating branch: " + e.getMessage());
+            }
+            redirectPage = "groups";
+
+        } else if ("add_division".equals(action)) {
+            try {
+                String name = req.getParameter("name");
+                String yearStr = req.getParameter("year");
+                int capacity = 0;
+                if(req.getParameter("capacity") != null && !req.getParameter("capacity").trim().isEmpty()){
+                     capacity = Integer.parseInt(req.getParameter("capacity"));
+                }
+                String classroom = req.getParameter("classroom");
+                Long branchId = Long.parseLong(req.getParameter("branch_id"));
+
+                Division div = new Division();
+                div.setName(name);
+                
+                // Convert string "FY", "SY", "TY" to the YearLevel enum
+                YearLevel yearLevel = YearLevel.valueOf(yearStr);
+                div.setYear(yearLevel);
+                
+                div.setCapacity(capacity);
+                div.setClassroom(classroom);
+                
+                // Fetch the actual Branch object to avoid detached entity problems
+                com.timetable.dao.BranchDao branchDao = new com.timetable.dao.BranchDao();
+                Branch branch = branchDao.findById(branchId);
+                
+                if (branch == null) {
+                    throw new Exception("Branch with ID " + branchId + " not found in the database. Please create it first.");
+                }
+                
+                div.setBranch(branch);
+
+                divisionDao.save(div);
+                req.getSession().setAttribute("flashMessage", "✅ Division created successfully!");
+            } catch (Exception e) {
+                req.getSession().setAttribute("flashMessage", "❌ Error creating division: " + e.getMessage());
+            }
+            redirectPage = "groups";
+
         } else if ("add_workload".equals(action)) {
             try {
                 Long facultyId = Long.parseLong(req.getParameter("faculty_id"));
                 Long subjectId = Long.parseLong(req.getParameter("subject_id"));
                 Long groupId = Long.parseLong(req.getParameter("group_id"));
+                Long divisionId = Long.parseLong(req.getParameter("division_id"));
 
                 Workload w = new Workload();
                 w.setFaculty(resourceService.getFaculty(facultyId));
                 w.setSubject(resourceService.getSubject(subjectId));
                 w.setStudentGroup(resourceService.getStudentGroup(groupId));
+                w.setDivision(divisionDao.findById(divisionId));
                 w.setSessionType(SessionType.THEORY);
                 resourceService.addWorkload(w);
                 req.getSession().setAttribute("flashMessage", "✅ Workload assigned successfully!");
@@ -248,6 +312,7 @@ public class AdminServlet extends HttpServlet {
             try {
                 TimetableConfig config = new TimetableConfig();
                 config.setConfigName("Default Config");
+                config.setYearLevel(com.timetable.model.YearLevel.valueOf(req.getParameter("yearLevel")));
                 config.setFirstLectureStartTime(LocalTime.parse(req.getParameter("startTime")));
                 config.setLectureDurationMinutes(Integer.parseInt(req.getParameter("duration")));
                 config.setLecturesPerDay(Integer.parseInt(req.getParameter("lecturesPerDay")));
@@ -311,6 +376,8 @@ public class AdminServlet extends HttpServlet {
         } else if ("groups".equals(page)) {
             req.setAttribute("groups", resourceService.getAllStudentGroups());
             req.setAttribute("divisions", divisionDao.findAll());
+            com.timetable.dao.BranchDao branchDao = new com.timetable.dao.BranchDao();
+            req.setAttribute("branches", branchDao.findAll());
             req.getRequestDispatcher("admin/student_groups.jsp").forward(req, resp);
 
         } else if ("workload".equals(page)) {
@@ -318,6 +385,7 @@ public class AdminServlet extends HttpServlet {
             req.setAttribute("faculties", resourceService.getAllFaculty());
             req.setAttribute("subjects", resourceService.getAllSubjects());
             req.setAttribute("groups", resourceService.getAllStudentGroups());
+            req.setAttribute("divisions", divisionDao.findAll());
             req.getRequestDispatcher("admin/workload.jsp").forward(req, resp);
 
         } else if ("timetable".equals(page)) {
@@ -326,7 +394,7 @@ public class AdminServlet extends HttpServlet {
             req.getRequestDispatcher("admin/view_timetable.jsp").forward(req, resp);
 
         } else if ("constraints".equals(page)) {
-            TimetableConfig activeConfig = configDao.getActiveConfig();
+            TimetableConfig activeConfig = configDao.getActiveConfig(com.timetable.model.YearLevel.FY);
             req.setAttribute("activeConfig", activeConfig);
             req.getRequestDispatcher("admin/constraints.jsp").forward(req, resp);
 

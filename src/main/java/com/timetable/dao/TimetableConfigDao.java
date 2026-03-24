@@ -15,14 +15,15 @@ public class TimetableConfigDao extends GenericDao<TimetableConfig> {
     /**
      * Get the active configuration
      */
-    public TimetableConfig getActiveConfig() {
+    public TimetableConfig getActiveConfig(com.timetable.model.YearLevel yearLevel) {
         Transaction transaction = null;
         TimetableConfig config = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
             Query<TimetableConfig> query = session.createQuery(
-                    "FROM TimetableConfig WHERE isActive = true ORDER BY id DESC",
+                    "FROM TimetableConfig WHERE isActive = true AND yearLevel = :yl ORDER BY id DESC",
                     TimetableConfig.class);
+            query.setParameter("yl", yearLevel);
             query.setMaxResults(1);
             config = query.uniqueResult();
             transaction.commit();
@@ -38,11 +39,12 @@ public class TimetableConfigDao extends GenericDao<TimetableConfig> {
     /**
      * Deactivate all configs
      */
-    public void deactivateAll() {
+    public void deactivateAll(com.timetable.model.YearLevel yearLevel) {
         Transaction transaction = null;
         try (Session session = HibernateUtil.getSessionFactory().openSession()) {
             transaction = session.beginTransaction();
-            session.createMutationQuery("UPDATE TimetableConfig SET isActive = false")
+            session.createMutationQuery("UPDATE TimetableConfig SET isActive = false WHERE yearLevel = :yl")
+                    .setParameter("yl", yearLevel)
                     .executeUpdate();
             transaction.commit();
         } catch (Exception e) {
@@ -57,8 +59,8 @@ public class TimetableConfigDao extends GenericDao<TimetableConfig> {
      * Save config and set as active
      */
     public void saveAsActive(TimetableConfig config) {
-        // Deactivate all existing configs
-        deactivateAll();
+        // Deactivate all existing configs for this year level
+        deactivateAll(config.getYearLevel());
 
         // Set this config as active
         config.setIsActive(true);

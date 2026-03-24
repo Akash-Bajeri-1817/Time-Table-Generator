@@ -26,8 +26,7 @@ public class TimetableConstraintProvider implements ConstraintProvider {
         public Constraint[] defineConstraints(ConstraintFactory factory) {
                 return new Constraint[] {
                                 // --- HARD CONSTRAINTS ---
-                                // Note: roomConflict removed — rooms are fixed per division
-                                // so two divisions can never share a room (ensured by pre-assignment).
+                                yearLevelMatch(factory),
                                 teacherConflict(factory),
                                 studentGroupConflict(factory),
                                 divisionConflict(factory),
@@ -35,6 +34,24 @@ public class TimetableConstraintProvider implements ConstraintProvider {
                                 // --- SOFT CONSTRAINTS ---
                                 subjectVarietyPerDay(factory)
                 };
+        }
+
+        // =========================================================
+        // HARD 1: A workload must be scheduled in a TimeSlot matching its Year Level.
+        // If the TimeSlot has no YearLevel (null), it is considered a universal slot
+        // and can be used by any year. Only penalise when both have a value AND they differ.
+        // =========================================================
+        private Constraint yearLevelMatch(ConstraintFactory factory) {
+                return factory.forEach(Schedule.class)
+                                .filter(s -> s.getTimeSlot() != null &&
+                                                s.getWorkload() != null &&
+                                                s.getWorkload().getDivision() != null &&
+                                                s.getTimeSlot().getYearLevel() != null &&
+                                                s.getWorkload().getDivision().getYear() != null &&
+                                                !s.getTimeSlot().getYearLevel().name()
+                                                                .equals(s.getWorkload().getDivision().getYear()))
+                                .penalize(HardSoftScore.ONE_HARD)
+                                .asConstraint("Year Level Mismatch");
         }
 
         // =========================================================

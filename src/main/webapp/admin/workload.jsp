@@ -216,12 +216,21 @@
                                     </c:forEach>
                                 </select>
                             </div>
-                            <div><label class="block text-sm font-medium mb-1.5">Student Group / Division *</label>
+                            <div><label class="block text-sm font-medium mb-1.5">Student Group *</label>
                                 <select name="group_id" required
                                     class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
                                     <option value="">Select student group</option>
                                     <c:forEach var="g" items="${groups}">
                                         <option value="${g.id}">${g.name}</option>
+                                    </c:forEach>
+                                </select>
+                            </div>
+                            <div><label class="block text-sm font-medium mb-1.5">Division *</label>
+                                <select name="division_id" required
+                                    class="w-full px-3 py-2.5 border border-border-color rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 bg-white">
+                                    <option value="">Select division</option>
+                                    <c:forEach var="d" items="${divisions}">
+                                        <option value="${d.id}">${d.year} ${d.branch.code} - Div ${d.name}</option>
                                     </c:forEach>
                                 </select>
                             </div>

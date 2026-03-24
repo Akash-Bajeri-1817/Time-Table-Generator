@@ -16,6 +16,10 @@ public class TimetableConfig {
     @Column(name = "config_name", length = 100)
     private String configName;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "year_level")
+    private YearLevel yearLevel;
+
     @Column(name = "first_lecture_start_time", nullable = false)
     private LocalTime firstLectureStartTime;
 
@@ -99,6 +103,14 @@ public class TimetableConfig {
 
     public void setConfigName(String configName) {
         this.configName = configName;
+    }
+
+    public YearLevel getYearLevel() {
+        return yearLevel;
+    }
+
+    public void setYearLevel(YearLevel yearLevel) {
+        this.yearLevel = yearLevel;
     }
 
     public LocalTime getFirstLectureStartTime() {

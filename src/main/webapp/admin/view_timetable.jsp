@@ -73,6 +73,26 @@
 								<span class="text-sm bg-primary-light px-3 py-1 rounded-full font-medium text-primary">
 									<span id="lectureCount">${schedules.size()}</span> lectures
 								</span>
+								<%-- Sample data dropdown --%>
+								<div class="relative" id="sampleDataMenu">
+									<button onclick="document.getElementById('sampleDropdown').classList.toggle('hidden')"
+										class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors">
+										<span class="material-symbols-outlined text-lg">database</span> Load Data
+										<span class="material-symbols-outlined text-sm">expand_more</span>
+									</button>
+									<div id="sampleDropdown" class="hidden absolute right-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-1">
+										<a href="${pageContext.request.contextPath}/admin?action=load_sample_data"
+											class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-header hover:bg-gray-50">
+											<span class="material-symbols-outlined text-base text-orange-500">school</span>
+											Load TY Sample Data
+										</a>
+										<a href="${pageContext.request.contextPath}/admin?action=load_fy_sample_data"
+											class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-header hover:bg-gray-50">
+											<span class="material-symbols-outlined text-base text-blue-500">school</span>
+											Load FY Sample Data (2 PM)
+										</a>
+									</div>
+								</div>
 								<button onclick="exportPDF()"
 									class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors">
 									<span class="material-symbols-outlined text-lg">download</span> Export PDF
@@ -116,7 +136,12 @@
 											<a href="${pageContext.request.contextPath}/admin?action=load_sample_data"
 												class="flex items-center gap-2 px-5 py-2.5 border border-border-color bg-white rounded-lg text-sm font-medium hover:bg-gray-50">
 												<span class="material-symbols-outlined text-lg">database</span>Load
-												Sample Data
+												TY Sample Data
+											</a>
+											<a href="${pageContext.request.contextPath}/admin?action=load_fy_sample_data"
+												class="flex items-center gap-2 px-5 py-2.5 border border-border-color bg-white rounded-lg text-sm font-medium hover:bg-gray-50 text-blue-700 border-blue-200">
+												<span class="material-symbols-outlined text-lg">database</span>Load
+												FY Sample Data (2 PM)
 											</a>
 											<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
 												class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90">
@@ -155,7 +180,7 @@
 																	request.setAttribute("allSchedList", allSched);
 																	%>
 
-																	<%-- Division tabs --%>
+																		<%-- Division tabs --%>
 																		<div
 																			class="flex items-center gap-2 mb-5 flex-wrap">
 																			<span
@@ -165,40 +190,11 @@
 																				onclick="filterGroup('all', this)">All
 																				Divisions</button>
 																			<c:forEach var="grp" items="${groups}">
-																				<c:choose>
-																					<c:when
-																						test="${fn:contains(grp.name,'Div A')}">
-																						<c:set var="tabCls"
-																							value="text-blue-700 border-blue-200" />
-																						<c:set var="tabIcon"
-																							value="🔵" />
-																					</c:when>
-																					<c:when
-																						test="${fn:contains(grp.name,'Div B')}">
-																						<c:set var="tabCls"
-																							value="text-green-700 border-green-200" />
-																						<c:set var="tabIcon"
-																							value="🟢" />
-																					</c:when>
-																					<c:when
-																						test="${fn:contains(grp.name,'Div C')}">
-																						<c:set var="tabCls"
-																							value="text-orange-700 border-orange-200" />
-																						<c:set var="tabIcon"
-																							value="🟠" />
-																					</c:when>
-																					<c:otherwise>
-																						<c:set var="tabCls"
-																							value="text-text-body" />
-																						<c:set var="tabIcon"
-																							value="📋" />
-																					</c:otherwise>
-																				</c:choose>
 																				<button
-																					class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white ${tabCls}"
+																					class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-text-body"
 																					data-gid="${grp.id}"
 																					onclick="filterGroup('${grp.id}', this)">
-																					${tabIcon} ${grp.name}
+																					📋 ${grp.name}
 																				</button>
 																			</c:forEach>
 																		</div>
@@ -208,18 +204,18 @@
 																				class="flex items-center gap-5 mb-4 flex-wrap text-xs text-text-body">
 																				<div class="flex items-center gap-1.5">
 																					<div
-																						class="size-3 rounded bg-blue-200">
-																					</div>Div A
+																						class="size-3 rounded border border-gray-300" style="background-color: #E8F5E9;">
+																					</div>First Year (FY)
 																				</div>
 																				<div class="flex items-center gap-1.5">
 																					<div
-																						class="size-3 rounded bg-green-200">
-																					</div>Div B
+																						class="size-3 rounded border border-gray-300" style="background-color: #E3F2FD;">
+																					</div>Second Year (SY)
 																				</div>
 																				<div class="flex items-center gap-1.5">
 																					<div
-																						class="size-3 rounded bg-orange-200">
-																					</div>Div C
+																						class="size-3 rounded border border-gray-300" style="background-color: #FFF3E0;">
+																					</div>Third Year (TY)
 																				</div>
 																				<div
 																					class="ml-auto flex items-center gap-1.5">
@@ -286,22 +282,7 @@
 																															test="${sc.timeSlot.startTime == st and sc.timeSlot.dayOfWeek == d}">
 																															<c:choose>
 																																<c:when
-																																	test="${fn:contains(sc.workload.studentGroup.name,'Div A')}">
-																																	<c:set
-																																		var="cardBg"
-																																		value="bg-blue-50 border-blue-200" />
-																																	<c:set
-																																		var="badgeCls"
-																																		value="bg-blue-100 text-blue-700" />
-																																	<c:set
-																																		var="badgeTxt"
-																																		value="DIV A" />
-																																	<c:set
-																																		var="nameCls"
-																																		value="text-blue-800" />
-																																</c:when>
-																																<c:when
-																																	test="${fn:contains(sc.workload.studentGroup.name,'Div B')}">
+																																	test="${sc.workload.division.year == 'FY'}">
 																																	<c:set
 																																		var="cardBg"
 																																		value="bg-green-50 border-green-200" />
@@ -310,10 +291,25 @@
 																																		value="bg-green-100 text-green-700" />
 																																	<c:set
 																																		var="badgeTxt"
-																																		value="DIV B" />
+																																		value="FY - ${sc.workload.studentGroup.name}" />
 																																	<c:set
 																																		var="nameCls"
 																																		value="text-green-800" />
+																																</c:when>
+																																<c:when
+																																	test="${sc.workload.division.year == 'SY'}">
+																																	<c:set
+																																		var="cardBg"
+																																		value="bg-blue-50 border-blue-200" />
+																																	<c:set
+																																		var="badgeCls"
+																																		value="bg-blue-100 text-blue-700" />
+																																	<c:set
+																																		var="badgeTxt"
+																																		value="SY - ${sc.workload.studentGroup.name}" />
+																																	<c:set
+																																		var="nameCls"
+																																		value="text-blue-800" />
 																																</c:when>
 																																<c:otherwise>
 																																	<c:set
@@ -324,7 +320,7 @@
 																																		value="bg-orange-100 text-orange-700" />
 																																	<c:set
 																																		var="badgeTxt"
-																																		value="DIV C" />
+																																		value="TY - ${sc.workload.studentGroup.name}" />
 																																	<c:set
 																																		var="nameCls"
 																																		value="text-orange-800" />

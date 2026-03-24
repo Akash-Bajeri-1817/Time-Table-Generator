@@ -159,10 +159,15 @@
 								Generate AI Timetable
 							</a>
 							<a href="${pageContext.request.contextPath}/admin?action=load_sample_data"
-								class="bg-white text-primary border border-primary/20 px-6 py-3 rounded-lg font-bold text-sm hover:bg-primary/5 transition-all flex items-center gap-2">
-								<span class="material-symbols-outlined text-lg">database</span>
-								Load Sample Data
-							</a>
+					class="bg-white text-primary border border-primary/20 px-6 py-3 rounded-lg font-bold text-sm hover:bg-primary/5 transition-all flex items-center gap-2">
+					<span class="material-symbols-outlined text-lg">database</span>
+					Load TY Sample Data
+				</a>
+				<a href="${pageContext.request.contextPath}/admin?action=load_fy_sample_data"
+					class="bg-white text-blue-700 border border-blue-200 px-6 py-3 rounded-lg font-bold text-sm hover:bg-blue-50 transition-all flex items-center gap-2">
+					<span class="material-symbols-outlined text-lg">database</span>
+					Load FY Sample Data (2 PM)
+				</a>
 							<a href="${pageContext.request.contextPath}/admin?page=timetable"
 								class="bg-white text-slate-600 border border-slate-200 px-6 py-3 rounded-lg font-bold text-sm hover:bg-slate-50 transition-all flex items-center gap-2">
 								<span class="material-symbols-outlined text-lg">calendar_view_week</span>

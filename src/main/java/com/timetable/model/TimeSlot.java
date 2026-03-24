@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import lombok.AllArgsConstructor;
 import java.time.LocalTime;
 import java.time.DayOfWeek;
+import ai.timefold.solver.core.api.domain.lookup.PlanningId;
 
 @Entity
 @Table(name = "time_slots")
@@ -15,7 +16,12 @@ import java.time.DayOfWeek;
 public class TimeSlot {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @PlanningId
     private Long id;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "year_level")
+    private YearLevel yearLevel;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -47,6 +53,14 @@ public class TimeSlot {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public YearLevel getYearLevel() {
+        return yearLevel;
+    }
+
+    public void setYearLevel(YearLevel yearLevel) {
+        this.yearLevel = yearLevel;
     }
 
     public DayOfWeek getDayOfWeek() {
