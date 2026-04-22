@@ -32,8 +32,7 @@ public class FacultyLoginServlet extends HttpServlet {
             session.setAttribute("facultyUser", faculty);
             resp.sendRedirect(req.getContextPath() + "/faculty");
         } else {
-            req.setAttribute("error", "Invalid or unregistered email address.");
-            req.getRequestDispatcher("faculty_login.jsp").forward(req, resp);
+            resp.sendRedirect(req.getContextPath() + "/?loginError=teacher&msg=Invalid+or+unregistered+email+address");
         }
     }
 }

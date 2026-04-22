@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -102,11 +104,11 @@
                                     class="w-full pl-9 pr-4 py-2 bg-background-cream border-none rounded-lg text-sm focus:ring-1 focus:ring-primary placeholder-gray-400 text-text-header transition-all"
                                     placeholder="Search faculty, rooms..." type="text" />
                             </div>
-                            <button class="relative p-2 text-text-body hover:text-primary transition-colors">
+                            <!--  <button class="relative p-2 text-text-body hover:text-primary transition-colors">
                                 <span class="material-symbols-outlined">notifications</span>
                                 <span
                                     class="absolute top-1.5 right-1.5 w-4 h-4 bg-badge-error-text text-white text-[10px] font-bold flex items-center justify-center rounded-full border border-surface-white">3</span>
-                            </button>
+                            </button>-->
                         </div>
                     </header>
                     <div class="flex-1 overflow-auto flex bg-background-cream">
@@ -114,10 +116,20 @@
                             <div class="flex flex-col gap-6 max-w-7xl mx-auto">
                                 <!-- Flash Message -->
                                 <c:if test="${not empty sessionScope.flashMessage}">
-                                    <div class="bg-primary-light border border-primary text-primary px-4 py-3 rounded relative"
-                                        role="alert">
-                                        <span class="block sm:inline">${sessionScope.flashMessage}</span>
-                                    </div>
+                                    <c:choose>
+                                        <c:when test="${fn:contains(sessionScope.flashMessage, 'Duplicate') or fn:contains(sessionScope.flashMessage, 'required') or fn:contains(sessionScope.flashMessage, 'valid') or fn:contains(sessionScope.flashMessage, 'Error')}">
+                                            <div class="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded relative flex items-center gap-3" role="alert">
+                                                <span class="material-symbols-outlined text-lg">error</span>
+                                                <span class="block sm:inline text-sm font-medium">${sessionScope.flashMessage}</span>
+                                            </div>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <div class="bg-primary-light border border-primary text-primary px-4 py-3 rounded relative flex items-center gap-3" role="alert">
+                                                <span class="material-symbols-outlined text-lg">check_circle</span>
+                                                <span class="block sm:inline text-sm font-medium">${sessionScope.flashMessage}</span>
+                                            </div>
+                                        </c:otherwise>
+                                    </c:choose>
                                     <c:remove var="flashMessage" scope="session" />
                                 </c:if>
                                 <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -233,9 +245,9 @@
                                                                     </span>
                                                                 </td>
                                                                 <td class="p-4 text-right">
-                                                                    <a href="${pageContext.request.contextPath}/admin?action=delete_faculty&id=${f.id}"
+                                                                    <a href="javascript:void(0)"
                                                                         class="text-red-400 hover:text-red-600 transition-colors"
-                                                                        onclick="return confirm('Delete ${f.name}?');">
+                                                                        onclick="openConfirmModal('Delete Faculty', 'Are you sure you want to delete ${f.name}? This action cannot be undone.', '${pageContext.request.contextPath}/admin?action=delete_faculty&id=${f.id}')">
                                                                         <span
                                                                             class="material-symbols-outlined text-lg">delete</span>
                                                                     </a>
@@ -278,45 +290,41 @@
                             <div
                                 class="flex justify-between items-center p-6 border-b border-border-color bg-gray-50/50">
                                 <h3 class="text-xl font-bold text-text-header font-serif">Add New Faculty</h3>
-                                <button onclick="document.getElementById('addFacultyModal').classList.add('hidden')"
+                                <button onclick="closeFacultyModal()"
                                     class="text-gray-400 hover:text-gray-600 transition-colors">
                                     <span class="material-symbols-outlined">close</span>
                                 </button>
                             </div>
-                            <form action="${pageContext.request.contextPath}/admin" method="post" class="p-6">
+                            <form action="${pageContext.request.contextPath}/admin" method="post" class="p-6" id="facultyForm" onsubmit="return validateFacultyForm()">
                                 <input type="hidden" name="action" value="add_faculty">
                                 <div class="space-y-4">
                                     <div>
-                                        <label class="block text-sm font-semibold text-text-header mb-1 font-sans">Full
-                                            Name
-                                            *</label>
-                                        <input type="text" name="name" required
-                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm p-2.5 bg-background-cream placeholder-gray-400"
+                                        <label class="block text-sm font-semibold text-text-header mb-1 font-sans">Full Name *</label>
+                                        <input type="text" name="name" id="fName"
+                                            class="w-full rounded-lg border border-gray-300 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm p-2.5 bg-background-cream placeholder-gray-400 outline-none transition-all"
                                             placeholder="e.g. Dr. John Doe">
+                                        <p id="fNameErr" class="text-red-500 text-xs mt-1 hidden flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span><span></span></p>
                                     </div>
                                     <div>
-                                        <label class="block text-sm font-semibold text-text-header mb-1 font-sans">Email
-                                            address *</label>
-                                        <input type="email" name="email" required
-                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm p-2.5 bg-background-cream placeholder-gray-400"
+                                        <label class="block text-sm font-semibold text-text-header mb-1 font-sans">Email Address *</label>
+                                        <input type="email" name="email" id="fEmail"
+                                            class="w-full rounded-lg border border-gray-300 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm p-2.5 bg-background-cream placeholder-gray-400 outline-none transition-all"
                                             placeholder="john.doe@college.edu">
+                                        <p id="fEmailErr" class="text-red-500 text-xs mt-1 hidden flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span><span></span></p>
                                     </div>
                                     <div>
-                                        <label
-                                            class="block text-sm font-semibold text-text-header mb-1 font-sans">Department
-                                            *</label>
-                                        <input type="text" name="department" required
-                                            class="w-full rounded-lg border-gray-300 shadow-sm focus:border-primary focus:ring-primary text-sm p-2.5 bg-background-cream placeholder-gray-400"
+                                        <label class="block text-sm font-semibold text-text-header mb-1 font-sans">Department *</label>
+                                        <input type="text" name="department" id="fDept"
+                                            class="w-full rounded-lg border border-gray-300 shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20 text-sm p-2.5 bg-background-cream placeholder-gray-400 outline-none transition-all"
                                             placeholder="e.g. Computer Science">
+                                        <p id="fDeptErr" class="text-red-500 text-xs mt-1 hidden flex items-center gap-1"><span class="material-symbols-outlined text-sm">error</span><span></span></p>
                                     </div>
                                 </div>
                                 <div class="mt-8 flex justify-end gap-3">
-                                    <button type="button"
-                                        onclick="document.getElementById('addFacultyModal').classList.add('hidden')"
+                                    <button type="button" onclick="closeFacultyModal()"
                                         class="px-5 py-2.5 border border-gray-300 rounded-lg text-sm font-semibold text-gray-700 hover:bg-gray-50 transition-colors">Cancel</button>
                                     <button type="submit"
-                                        class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">Save
-                                        Faculty</button>
+                                        class="px-5 py-2.5 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-semibold shadow-md hover:shadow-lg transition-all">Save Faculty</button>
                                 </div>
                             </form>
                         </div>
@@ -325,4 +333,80 @@
 
     </body>
 
+    <script>
+        function showFErr(id, msg) {
+            const p = document.getElementById(id);
+            p.querySelector('span:last-child').textContent = msg;
+            p.classList.remove('hidden');
+            p.classList.add('flex');
+        }
+        function clearFErr(id) {
+            const p = document.getElementById(id);
+            p.classList.add('hidden');
+            p.classList.remove('flex');
+        }
+        function closeFacultyModal() {
+            document.getElementById('addFacultyModal').classList.add('hidden');
+            ['fNameErr','fEmailErr','fDeptErr'].forEach(clearFErr);
+            document.getElementById('facultyForm').reset();
+        }
+
+        function validateFacultyForm() {
+            let valid = true;
+            const name  = document.getElementById('fName').value.trim();
+            const email = document.getElementById('fEmail').value.trim();
+            const dept  = document.getElementById('fDept').value.trim();
+            const nameReg = /^[A-Za-z. \-]{2,100}$/;
+            const emailReg = /^[\w.+\-]+@[\w\-]+\.[\w.]+$/;
+            const deptReg = /^[A-Za-z \-]{2,100}$/;
+
+            clearFErr('fNameErr'); clearFErr('fEmailErr'); clearFErr('fDeptErr');
+
+            if (!name) { showFErr('fNameErr', 'Faculty name is required.'); valid = false; }
+            else if (!nameReg.test(name)) { showFErr('fNameErr', 'Name must contain only letters, spaces, dots, dashes (min 2 chars).'); valid = false; }
+
+            if (!email) { showFErr('fEmailErr', 'Email address is required.'); valid = false; }
+            else if (!emailReg.test(email)) { showFErr('fEmailErr', 'Please enter a valid email (e.g. john@college.edu).'); valid = false; }
+
+            if (!dept) { showFErr('fDeptErr', 'Department is required.'); valid = false; }
+            else if (!deptReg.test(dept)) { showFErr('fDeptErr', 'Department name must contain only letters, spaces, dashes (min 2 chars).'); valid = false; }
+
+            return valid;
+        }
+
+        document.getElementById('fName').addEventListener('blur', function(){ if(/^[A-Za-z. \-]{2,100}$/.test(this.value.trim())) clearFErr('fNameErr'); });
+        document.getElementById('fEmail').addEventListener('blur', function(){ if(/^[\w.+\-]+@[\w\-]+\.[\w.]+$/.test(this.value.trim())) clearFErr('fEmailErr'); });
+        document.getElementById('fDept').addEventListener('blur', function(){ if(/^[A-Za-z \-]{2,100}$/.test(this.value.trim())) clearFErr('fDeptErr'); });
+
+        document.addEventListener('keydown', e => { if(e.key==='Escape') closeFacultyModal(); });
+
+        function openConfirmModal(title, text, url) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalText').textContent = text;
+            document.getElementById('confirmModalLink').href = url;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+    </script>
+    
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all p-6">
+            <div class="mb-6 flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-red-600">warning</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900" id="confirmModalTitle">Confirm Action</h3>
+                    <p class="text-sm text-gray-600 mt-1" id="confirmModalText">Are you sure you want to proceed?</p>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end mt-4">
+                <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <a id="confirmModalLink" href="#" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Confirm</a>
+            </div>
+        </div>
+    </div>
     </html>

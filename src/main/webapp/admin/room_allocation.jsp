@@ -1,4 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@ taglib prefix="c" uri="jakarta.tags.core" %>
+<%@ taglib prefix="fn" uri="jakarta.tags.functions" %>
     <!DOCTYPE html>
     <html lang="en">
 
@@ -72,17 +74,33 @@
                                     class="w-full h-10 pl-10 pr-4 bg-slate-50 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 placeholder-slate-400"
                                     placeholder="Search rooms..." type="text" />
                             </div>
-                            <button
+                           <!--   <button
                                 class="relative p-2 text-slate-500 hover:bg-slate-100 rounded-full transition-colors">
                                 <span class="material-symbols-outlined">notifications</span>
                                 <span
                                     class="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-white"></span>
-                            </button>
+                            </button>-->
                         </div>
                     </header>
 
                     <!-- Dashboard Content -->
                     <div class="p-8 space-y-8 max-w-7xl mx-auto w-full">
+                        <c:if test="${not empty message}">
+                            <c:choose>
+                                <c:when test="${fn:contains(message, 'Duplicate') or fn:contains(message, 'required') or fn:contains(message, 'Error')}">
+                                    <div class="bg-red-50 border border-red-200 rounded-xl p-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-red-600">error</span>
+                                        <p class="text-sm text-red-800 font-medium">${message}</p>
+                                    </div>
+                                </c:when>
+                                <c:otherwise>
+                                    <div class="bg-green-50 border border-green-200 rounded-xl p-4 flex items-center gap-3">
+                                        <span class="material-symbols-outlined text-green-600">check_circle</span>
+                                        <p class="text-sm text-green-800 font-medium">${message}</p>
+                                    </div>
+                                </c:otherwise>
+                            </c:choose>
+                        </c:if>
 
                         <!-- KPI Cards -->
                         <div class="flex">
@@ -186,10 +204,9 @@
                                                 <button
                                                     class="w-full py-2 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">Quick
                                                     Assign</button>
-                                                <a href="${pageContext.request.contextPath}/admin?action=delete_room&id=${room.id}"
-                                                    class="w-full py-2 border border-red-100 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 text-center transition-colors"
-                                                    onclick="return confirm('Delete room ${room.name}?');">Delete
-                                                    Room</a>
+                                                <a href="javascript:void(0)"
+                                                    class="w-full py-2 border border-red-100 rounded-lg text-sm font-medium text-red-500 hover:bg-red-50 text-center transition-colors block"
+                                                    onclick="openConfirmModal('Delete Room', 'Are you sure you want to delete ${room.name}? This action cannot be undone.', '${pageContext.request.contextPath}/admin?action=delete_room&id=${room.id}')">Delete Room</a>
                                             </div>
                                         </div>
                                     </c:forEach>
@@ -213,37 +230,40 @@
                                 </div>
                                 <h2 class="text-lg font-bold font-serif text-slate-900">Add New Room</h2>
                             </div>
-                            <button onclick="document.getElementById('addRoomModal').classList.add('hidden')"
+                            <button onclick="closeRoomModal()"
                                 class="p-2 rounded-lg hover:bg-gray-100 text-slate-400"><span
                                     class="material-symbols-outlined">close</span></button>
                         </div>
-                        <form method="post" action="${pageContext.request.contextPath}/admin" class="p-6 space-y-4">
+                        <form method="post" action="${pageContext.request.contextPath}/admin"
+                              class="p-6 space-y-4" id="roomForm" onsubmit="return validateRoomForm()">
                             <input type="hidden" name="action" value="add_room" />
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Room Name *</label>
-                                <input type="text" name="name" placeholder="e.g. Room 101, Lab 201" required
-                                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 placeholder:text-slate-400 bg-slate-50" />
+                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Room Name * <span class="text-gray-400 font-normal text-xs">(must be unique)</span></label>
+                                <input type="text" name="name" id="rName" placeholder="e.g. Room 101, Lab 201"
+                                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 placeholder:text-slate-400 bg-slate-50" />
+                                <p id="rNameErr" class="text-red-500 text-xs mt-1 hidden"></p>
                             </div>
                             <div>
-                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Capacity *</label>
-                                <input type="number" name="capacity" placeholder="e.g. 60" required min="1"
-                                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 placeholder:text-slate-400 bg-slate-50" />
+                                <label class="block text-sm font-medium text-slate-700 mb-1.5">Capacity * <span class="text-gray-400 font-normal text-xs">(1–1000)</span></label>
+                                <input type="number" name="capacity" id="rCap" placeholder="e.g. 60" min="1" max="1000"
+                                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 placeholder:text-slate-400 bg-slate-50" />
+                                <p id="rCapErr" class="text-red-500 text-xs mt-1 hidden"></p>
                             </div>
                             <div>
                                 <label class="block text-sm font-medium text-slate-700 mb-1.5">Room Type *</label>
-                                <select name="type" required
-                                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary text-slate-900 bg-slate-50">
+                                <select name="type" id="rType"
+                                    class="w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all text-slate-900 bg-slate-50">
+                                    <option value="">Select room type</option>
                                     <option value="CLASSROOM">Classroom</option>
                                     <option value="LAB">Laboratory</option>
                                 </select>
+                                <p id="rTypeErr" class="text-red-500 text-xs mt-1 hidden"></p>
                             </div>
                             <div class="flex justify-end gap-3 pt-4">
-                                <button type="button"
-                                    onclick="document.getElementById('addRoomModal').classList.add('hidden')"
+                                <button type="button" onclick="closeRoomModal()"
                                     class="px-5 py-2.5 border border-slate-200 rounded-lg text-sm font-medium text-slate-600 hover:bg-slate-50 transition-colors">Cancel</button>
                                 <button type="submit"
-                                    class="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">Create
-                                    Room</button>
+                                    class="px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90 transition-colors">Create Room</button>
                             </div>
                         </form>
                     </div>
@@ -252,4 +272,62 @@
         </div>
     </body>
 
+    <script>
+        function showRErr(id, msg){ const e=document.getElementById(id); e.textContent=msg; e.classList.remove('hidden'); }
+        function clearRErr(id){ const e=document.getElementById(id); e.textContent=''; e.classList.add('hidden'); }
+        function closeRoomModal(){
+            document.getElementById('addRoomModal').classList.add('hidden');
+            ['rNameErr','rCapErr','rTypeErr'].forEach(clearRErr);
+            document.getElementById('roomForm').reset();
+        }
+        function validateRoomForm(){
+            let valid = true;
+            const name = document.getElementById('rName').value.trim();
+            const cap  = parseInt(document.getElementById('rCap').value, 10);
+            const type = document.getElementById('rType').value;
+            ['rNameErr','rCapErr','rTypeErr'].forEach(clearRErr);
+
+            if(!name){ showRErr('rNameErr','Room name is required.'); valid=false; }
+            else if(!/^[A-Za-z0-9 \-]{2,50}$/.test(name)){ showRErr('rNameErr','Room name must contain only letters, numbers, spaces, dashes (min 2 chars).'); valid=false; }
+
+            if(isNaN(cap)||cap<1||cap>1000){ showRErr('rCapErr','Capacity must be a number between 1 and 1000.'); valid=false; }
+
+            if(!type){ showRErr('rTypeErr','Please select a room type.'); valid=false; }
+
+            return valid;
+        }
+        document.getElementById('rName').addEventListener('input', function(){ if(/^[A-Za-z0-9 \-]{2,50}$/.test(this.value.trim())) clearRErr('rNameErr'); });
+        document.getElementById('rCap').addEventListener('input', function(){ const v=parseInt(this.value,10); if(v>=1&&v<=1000) clearRErr('rCapErr'); });
+        document.getElementById('rType').addEventListener('change', function(){ if(this.value) clearRErr('rTypeErr'); });
+        document.addEventListener('keydown', function(e){ if(e.key==='Escape') closeRoomModal(); });
+
+        function openConfirmModal(title, text, url) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalText').textContent = text;
+            document.getElementById('confirmModalLink').href = url;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+    </script>
+    
+    <!-- Confirm Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all p-6">
+            <div class="mb-6 flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-red-600">warning</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900" id="confirmModalTitle">Confirm Action</h3>
+                    <p class="text-sm text-gray-600 mt-1" id="confirmModalText">Are you sure you want to proceed?</p>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end mt-4">
+                <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <a id="confirmModalLink" href="#" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Confirm</a>
+            </div>
+        </div>
+    </div>
     </html>

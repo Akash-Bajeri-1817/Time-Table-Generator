@@ -1,4 +1,9 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%
+    String loginError = request.getParameter("loginError");
+    String loginMsg = request.getParameter("msg");
+    if (loginMsg == null) loginMsg = "";
+%>
 	<!DOCTYPE html>
 	<html lang="en">
 
@@ -58,19 +63,15 @@
 						Pro</h2>
 				</div>
 				<nav class="hidden md:flex items-center gap-10">
-					<a class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
-						href="admin">Admin</a> <a
-						class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
-						href="faculty_login">Faculty</a> <a
-						class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
-						href="student">Student</a>
-				</nav>
-				<div class="flex items-center gap-4">
-					<a class="hidden sm:block text-sm font-semibold px-4 py-2 text-primary-dark hover:text-primary transition-colors"
-						href="admin">Log In</a> <a
-						class="flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-dark hover:shadow-primary/30 active:scale-95"
-						href="student"> Get Started </a>
-				</div>
+				<a class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
+					href="student">Student</a>
+			</nav>
+			<div class="flex items-center gap-4">
+				<button id="staffLoginBtn" onclick="openLoginModal()"
+					class="hidden sm:block text-sm font-semibold px-4 py-2 text-primary-dark hover:text-primary transition-colors">Staff Login</button>
+				<a class="flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-dark hover:shadow-primary/30 active:scale-95"
+					href="student"> Get Started </a>
+			</div>
 			</header>
 			<main class="flex-1">
 				<section class="mx-auto max-w-[1280px] px-6 py-16 md:px-20 lg:px-40 lg:py-24">
@@ -100,7 +101,7 @@
 									Organize your academic life in seconds.</p>
 							</div>
 							<div class="flex flex-wrap gap-4">
-								<a href="admin"
+								<a href="student"
 									class="flex h-14 min-w-[180px] items-center justify-center rounded-xl bg-primary px-8 text-base font-bold text-white shadow-xl shadow-primary/20 transition-all hover:scale-[1.02] hover:bg-primary-dark hover:shadow-primary/30">
 									Get Started Free </a> <a href="#features"
 									class="flex h-14 min-w-[180px] items-center justify-center rounded-xl border border-primary/20 bg-white px-8 text-base font-bold text-primary-dark shadow-sm transition-all hover:bg-surface-alt hover:border-primary/40">
@@ -201,7 +202,7 @@
 								to organize your semester?</h2>
 							<p class="max-w-xl text-lg text-white/90">Join thousands of
 								students and faculty members who have simplified their schedules.</p>
-							<a href="admin"
+							<a href="student"
 								class="flex h-14 min-w-[220px] items-center justify-center rounded-xl bg-white px-10 text-lg font-bold text-primary shadow-xl transition-all hover:scale-105 hover:shadow-2xl active:scale-95">
 								Get Started Now </a>
 						</div>
@@ -242,6 +243,198 @@
 				</div>
 			</footer>
 		</div>
+
+		<!-- ===== STAFF LOGIN MODAL ===== -->
+		<div id="loginModal"
+			class="fixed inset-0 z-[100] flex items-center justify-center p-4 opacity-0 pointer-events-none transition-all duration-300"
+			aria-hidden="true">
+			<!-- Backdrop -->
+			<div id="modalBackdrop" onclick="closeLoginModal()"
+				class="absolute inset-0 bg-black/50 backdrop-blur-sm"></div>
+
+			<!-- Modal Card -->
+			<div
+				class="relative w-full max-w-md bg-white rounded-2xl shadow-2xl border border-primary/10 overflow-hidden transform scale-95 transition-transform duration-300"
+				id="modalCard">
+
+				<!-- Header -->
+				<div class="bg-primary/5 px-8 py-6 border-b border-primary/10">
+					<div class="flex items-center justify-between">
+						<div class="flex items-center gap-3">
+							<div
+								class="size-10 bg-primary rounded-xl flex items-center justify-center text-white shadow-md shadow-primary/20">
+								<span class="material-symbols-outlined text-xl">lock</span>
+							</div>
+							<div>
+								<h2 class="text-lg font-bold text-primary-dark">Staff Portal</h2>
+								<p class="text-xs text-text-muted">Sign in to your account</p>
+							</div>
+						</div>
+						<button onclick="closeLoginModal()"
+							class="size-8 flex items-center justify-center rounded-lg text-text-muted hover:bg-primary/10 hover:text-primary transition-colors">
+							<span class="material-symbols-outlined text-xl">close</span>
+						</button>
+					</div>
+
+					<!-- Role Tabs -->
+					<div class="mt-5 flex gap-1 bg-white rounded-xl p-1 border border-primary/10">
+						<button id="tabAdmin" onclick="switchTab('admin')"
+							class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all bg-primary text-white shadow-sm">
+							<span class="material-symbols-outlined text-base">admin_panel_settings</span>
+							Admin
+						</button>
+						<button id="tabTeacher" onclick="switchTab('teacher')"
+							class="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-sm font-semibold transition-all text-text-muted hover:text-primary-dark">
+							<span class="material-symbols-outlined text-base">school</span>
+							Teacher
+						</button>
+					</div>
+				</div>
+
+				<!-- Body -->
+				<div class="px-8 py-8">
+
+					<!-- Admin Form -->
+					<div id="formAdmin">
+						<form action="${pageContext.request.contextPath}/admin_login" method="POST"
+							class="space-y-5">
+							<div>
+								<label for="adminUsername"
+									class="block text-sm font-semibold text-gray-700 mb-1.5">Username</label>
+								<div class="relative">
+									<span
+										class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xl">person</span>
+									<input type="text" id="adminUsername" name="username" required
+										autocomplete="username"
+										class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none placeholder-gray-400"
+										placeholder="Enter admin username" />
+								</div>
+							</div>
+							<div>
+								<label for="adminPassword"
+									class="block text-sm font-semibold text-gray-700 mb-1.5">Password</label>
+								<div class="relative">
+									<span
+										class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xl">lock</span>
+									<input type="password" id="adminPassword" name="password" required
+										autocomplete="current-password"
+										class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none placeholder-gray-400"
+										placeholder="Enter admin password" />
+								</div>
+							</div>
+							<button type="submit"
+								class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+								<span class="material-symbols-outlined text-lg">login</span>
+								Sign In as Admin
+							</button>
+						</form>
+					</div>
+
+					<!-- Teacher Form -->
+					<div id="formTeacher" class="hidden">
+						<form action="${pageContext.request.contextPath}/faculty_login" method="POST"
+							class="space-y-5">
+							<div>
+								<label for="teacherEmail"
+									class="block text-sm font-semibold text-gray-700 mb-1.5">College Email</label>
+								<div class="relative">
+									<span
+										class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-text-muted text-xl">alternate_email</span>
+									<input type="email" id="teacherEmail" name="email" required
+										autocomplete="email"
+										class="w-full pl-10 pr-4 py-3 rounded-xl border border-gray-200 focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all text-sm outline-none placeholder-gray-400"
+										placeholder="john.doe@college.edu" />
+								</div>
+							</div>
+							<p class="text-xs text-text-muted bg-primary/5 border border-primary/10 rounded-lg px-3 py-2">
+								<span class="material-symbols-outlined text-sm align-middle text-primary">info</span>
+								Enter your registered college email to access your timetable.
+							</p>
+							<button type="submit"
+								class="w-full bg-primary hover:bg-primary-dark text-white font-bold py-3.5 rounded-xl shadow-lg shadow-primary/20 transition-all flex items-center justify-center gap-2">
+								<span class="material-symbols-outlined text-lg">login</span>
+								Sign In as Teacher
+							</button>
+						</form>
+					</div>
+
+				</div>
+			</div>
+		</div>
+
+		<script>
+			function openLoginModal() {
+				const modal = document.getElementById('loginModal');
+				const card = document.getElementById('modalCard');
+				modal.classList.remove('opacity-0', 'pointer-events-none');
+				modal.setAttribute('aria-hidden', 'false');
+				setTimeout(() => card.classList.remove('scale-95'), 10);
+				document.body.style.overflow = 'hidden';
+			}
+
+			function closeLoginModal() {
+				const modal = document.getElementById('loginModal');
+				const card = document.getElementById('modalCard');
+				card.classList.add('scale-95');
+				setTimeout(() => {
+					modal.classList.add('opacity-0', 'pointer-events-none');
+					modal.setAttribute('aria-hidden', 'true');
+				}, 200);
+				document.body.style.overflow = '';
+			}
+
+			function switchTab(role) {
+				const activeClass = ['bg-primary', 'text-white', 'shadow-sm'];
+				const inactiveClass = ['text-text-muted', 'hover:text-primary-dark'];
+
+				const tabAdmin = document.getElementById('tabAdmin');
+				const tabTeacher = document.getElementById('tabTeacher');
+				const formAdmin = document.getElementById('formAdmin');
+				const formTeacher = document.getElementById('formTeacher');
+
+				if (role === 'admin') {
+					tabAdmin.classList.add(...activeClass);
+					tabAdmin.classList.remove(...inactiveClass);
+					tabTeacher.classList.remove(...activeClass);
+					tabTeacher.classList.add(...inactiveClass);
+					formAdmin.classList.remove('hidden');
+					formTeacher.classList.add('hidden');
+				} else {
+					tabTeacher.classList.add(...activeClass);
+					tabTeacher.classList.remove(...inactiveClass);
+					tabAdmin.classList.remove(...activeClass);
+					tabAdmin.classList.add(...inactiveClass);
+					formTeacher.classList.remove('hidden');
+					formAdmin.classList.add('hidden');
+				}
+			}
+
+			// Close on Escape key
+			document.addEventListener('keydown', function(e) {
+				if (e.key === 'Escape') closeLoginModal();
+			});
+
+			// Auto-open modal if redirected back after a login error
+			<%if (loginError != null && !loginError.isEmpty()) {%>
+			window.addEventListener('DOMContentLoaded', function() {
+				const role = '<%= loginError %>';
+				switchTab(role === 'admin' ? 'admin' : 'teacher');
+				openLoginModal();
+				// Inject error banner into the active form
+				const errMsg = '<%= loginMsg.replace("'", "\\'") %>';
+				if (errMsg) {
+					const banner = document.createElement('div');
+					banner.className = 'flex items-center gap-2 bg-red-50 border border-red-200 text-red-600 px-4 py-3 rounded-xl text-sm mb-1';
+					banner.innerHTML = '<span class="material-symbols-outlined text-lg">error</span>' + errMsg.replace(/\+/g, ' ');
+					const activeForm = role === 'admin'
+						? document.getElementById('formAdmin')
+						: document.getElementById('formTeacher');
+					if (activeForm) activeForm.insertBefore(banner, activeForm.firstChild);
+				}
+			});
+			<%}%>
+		</script>
+
 	</body>
 
 	</html>

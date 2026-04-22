@@ -83,11 +83,11 @@
 							</div>
 						</div>
 						<div class="flex items-center gap-6">
-							<button class="relative p-2 text-slate-500 hover:bg-primary/5 rounded-lg transition-colors">
+							<!--  <button class="relative p-2 text-slate-500 hover:bg-primary/5 rounded-lg transition-colors">
 								<span class="material-symbols-outlined">notifications</span>
 								<span
 									class="absolute top-1 right-1 size-4 bg-red-500 text-[10px] text-white flex items-center justify-center rounded-full border-2 border-white">3</span>
-							</button>
+							</button>-->
 							<div class="h-8 w-px bg-slate-200"></div>
 							<div class="flex items-center gap-3 cursor-pointer">
 								<div class="text-right hidden xl:block">
@@ -173,8 +173,8 @@
 								<span class="material-symbols-outlined text-lg">calendar_view_week</span>
 								View Timetable
 							</a>
-							<a href="${pageContext.request.contextPath}/admin?action=clear_all_data"
-								onclick="return confirm('⚠️ Are you sure you want to clear ALL data?\n\nThis will permanently delete all faculty, subjects, rooms, workloads, timeslots, and schedules from the database.\n\nThis action cannot be undone.')"
+							<a href="javascript:void(0)"
+								onclick="openConfirmModal('Clear All Data', 'Are you sure you want to clear ALL data? This will permanently delete all faculty, subjects, rooms, workloads, timeslots, and schedules from the database. This action cannot be undone.', '${pageContext.request.contextPath}/admin?action=clear_all_data')"
 								class="bg-red-50 text-red-700 border border-red-200 px-6 py-3 rounded-lg font-bold text-sm hover:bg-red-100 hover:border-red-300 transition-all flex items-center gap-2">
 								<span class="material-symbols-outlined text-lg">delete_sweep</span>
 								Clear All Data
@@ -357,6 +357,36 @@
 					</div>
 				</main>
 			</div>
+
+	<!-- Confirm Modal -->
+    <div id="confirmModal" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all p-6">
+            <div class="mb-6 flex items-start gap-4">
+                <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                    <span class="material-symbols-outlined text-red-600">warning</span>
+                </div>
+                <div>
+                    <h3 class="text-lg font-bold text-gray-900" id="confirmModalTitle">Confirm Action</h3>
+                    <p class="text-sm text-gray-600 mt-1" id="confirmModalText">Are you sure you want to proceed?</p>
+                </div>
+            </div>
+            <div class="flex gap-3 justify-end mt-4">
+                <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                <a id="confirmModalLink" href="#" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Confirm</a>
+            </div>
+        </div>
+    </div>
+    <script>
+        function openConfirmModal(title, text, url) {
+            document.getElementById('confirmModalTitle').textContent = title;
+            document.getElementById('confirmModalText').textContent = text;
+            document.getElementById('confirmModalLink').href = url;
+            document.getElementById('confirmModal').classList.remove('hidden');
+        }
+        function closeConfirmModal() {
+            document.getElementById('confirmModal').classList.add('hidden');
+        }
+    </script>
 		</body>
 
 		</html>

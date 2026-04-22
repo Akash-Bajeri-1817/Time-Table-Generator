@@ -21,6 +21,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 
 @WebServlet("/admin")
 public class AdminServlet extends HttpServlet {
@@ -35,6 +36,13 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // ─── AUTH GUARD ─────────────────────────────────────────────
+        HttpSession authSession = req.getSession(false);
+        if (authSession == null || authSession.getAttribute("adminUser") == null) {
+            resp.sendRedirect(req.getContextPath() + "/?loginError=admin&msg=Please+login+first");
+            return;
+        }
+
         try {
             String action = req.getParameter("action");
             String page = req.getParameter("page");
@@ -147,31 +155,81 @@ public class AdminServlet extends HttpServlet {
             } else if ("delete_faculty".equals(action)) {
                 Long id = Long.parseLong(req.getParameter("id"));
                 resourceService.deleteFaculty(id);
-                req.setAttribute("message", "Faculty deleted.");
+                if (resourceService.getFaculty(id) != null) {
+                    req.setAttribute("message", "Error: Faculty cannot be deleted because they are assigned to workloads.");
+                } else {
+                    req.setAttribute("message", "Faculty deleted.");
+                }
                 page = "faculty";
 
             } else if ("delete_subject".equals(action)) {
                 Long id = Long.parseLong(req.getParameter("id"));
                 resourceService.deleteSubject(id);
-                req.setAttribute("message", "Subject deleted.");
+                if (resourceService.getSubject(id) != null) {
+                    req.setAttribute("message", "Error: Subject cannot be deleted because it is assigned to workloads.");
+                } else {
+                    req.setAttribute("message", "Subject deleted.");
+                }
                 page = "subjects";
 
             } else if ("delete_room".equals(action)) {
                 Long id = Long.parseLong(req.getParameter("id"));
                 resourceService.deleteRoom(id);
-                req.setAttribute("message", "Room deleted.");
+                if (resourceService.getAllRooms().stream().anyMatch(r -> r.getId().equals(id))) {
+                    req.setAttribute("message", "Error: Room cannot be deleted because it may be used as a default classroom.");
+                } else {
+                    req.setAttribute("message", "Room deleted.");
+                }
                 page = "rooms";
 
             } else if ("delete_group".equals(action)) {
                 Long id = Long.parseLong(req.getParameter("id"));
                 resourceService.deleteStudentGroup(id);
-                req.setAttribute("message", "Group deleted.");
+                if (resourceService.getStudentGroup(id) != null) {
+                    req.setAttribute("message", "Error: Student Group cannot be deleted because it is assigned to workloads.");
+                } else {
+                    req.setAttribute("message", "Group deleted.");
+                }
+                page = "groups";
+
+            } else if ("delete_division".equals(action)) {
+                Long id = Long.parseLong(req.getParameter("id"));
+                
+                // Manually cascade delete associated Schedules to prevent FK constraints
+                com.timetable.dao.ScheduleDao sDao = new com.timetable.dao.ScheduleDao();
+                sDao.findAll().stream()
+                    .filter(s -> s.getDivision() != null && s.getDivision().getId().equals(id))
+                    .forEach(s -> sDao.delete(s.getId()));
+
+                // Manually cascade delete associated Workloads
+                com.timetable.dao.WorkloadDao wDao = new com.timetable.dao.WorkloadDao();
+                wDao.findAll().stream()
+                    .filter(w -> w.getDivision() != null && w.getDivision().getId().equals(id))
+                    .forEach(w -> wDao.delete(w.getId()));
+                
+                // Manually cascade delete associated Batches
+                com.timetable.dao.BatchDao bDao = new com.timetable.dao.BatchDao();
+                bDao.findAll().stream()
+                    .filter(b -> b.getDivision() != null && b.getDivision().getId().equals(id))
+                    .forEach(b -> bDao.delete(b.getId()));
+
+                com.timetable.dao.DivisionDao dDao = new com.timetable.dao.DivisionDao();
+                dDao.delete(id);
+                if (dDao.findById(id) != null) {
+                    req.setAttribute("message", "Error: Division cannot be deleted. Please check for other dependencies in the database.");
+                } else {
+                    req.setAttribute("message", "Division and its related Batches, Workloads, and Schedules deleted successfully.");
+                }
                 page = "groups";
 
             } else if ("delete_workload".equals(action)) {
                 Long id = Long.parseLong(req.getParameter("id"));
                 resourceService.deleteWorkload(id);
-                req.setAttribute("message", "Workload deleted.");
+                if (resourceService.getAllWorkloads().stream().anyMatch(w -> w.getId().equals(id))) {
+                    req.setAttribute("message", "Error: Workload could not be deleted.");
+                } else {
+                    req.setAttribute("message", "Workload deleted.");
+                }
                 page = "workload";
 
             } else if ("configure_timeslots".equals(action)) {
@@ -196,55 +254,158 @@ public class AdminServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // ─── AUTH GUARD ─────────────────────────────────────────────
+        HttpSession authSession = req.getSession(false);
+        if (authSession == null || authSession.getAttribute("adminUser") == null) {
+            resp.sendRedirect(req.getContextPath() + "/?loginError=admin&msg=Please+login+first");
+            return;
+        }
+
         String action = req.getParameter("action");
         String redirectPage = "dashboard";
 
         if ("add_faculty".equals(action)) {
-            Faculty f = new Faculty();
-            f.setName(req.getParameter("name"));
-            f.setEmail(req.getParameter("email"));
-            f.setDepartment(req.getParameter("department"));
-            resourceService.addFaculty(f);
-            req.getSession().setAttribute("flashMessage", "✅ Faculty \"" + f.getName() + "\" added successfully!");
+            String name = req.getParameter("name");
+            String email = req.getParameter("email");
+            String dept = req.getParameter("department");
+
+            // Backend validation
+            if (name == null || name.trim().isEmpty() || !name.trim().matches("^[A-Za-z. \\-]{2,100}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Faculty name is required (letters, spaces, dots, dashes; min 2 chars).");
+            } else if (email == null || !email.matches("^[\\w.+-]+@[\\w-]+\\.[\\w.]+$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Please provide a valid email address.");
+            } else if (dept == null || dept.trim().isEmpty() || !dept.trim().matches("^[A-Za-z \\-]{2,100}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Department is required (letters, spaces, dashes; min 2 chars).");
+            } else {
+                com.timetable.dao.FacultyDao fDao = new com.timetable.dao.FacultyDao();
+                if (fDao.findByEmail(email.trim()) != null) {
+                    req.getSession().setAttribute("flashMessage",
+                        "❌ Duplicate: A faculty member with email \"" + email + "\" already exists.");
+                } else {
+                    Faculty f = new Faculty();
+                    f.setName(name.trim());
+                    f.setEmail(email.trim());
+                    f.setDepartment(dept.trim());
+                    resourceService.addFaculty(f);
+                    req.getSession().setAttribute("flashMessage", "✅ Faculty \"" + f.getName() + "\" added successfully!");
+                }
+            }
             redirectPage = "faculty";
 
         } else if ("add_subject".equals(action)) {
-            Subject s = new Subject();
-            s.setCode(req.getParameter("code"));
-            s.setName(req.getParameter("name"));
-            s.setDepartment(req.getParameter("department"));
-            s.setLecturesPerWeek(Integer.parseInt(req.getParameter("lectures")));
-            s.setPractical(req.getParameter("isPractical") != null);
-            resourceService.addSubject(s);
-            req.getSession().setAttribute("flashMessage", "✅ Subject \"" + s.getName() + "\" added successfully!");
+            String code = req.getParameter("code");
+            String sname = req.getParameter("name");
+            String sdept = req.getParameter("department");
+            String lecturesStr = req.getParameter("lectures");
+
+            if (code == null || code.trim().isEmpty() || !code.trim().matches("^[A-Za-z0-9_\\-]{2,10}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Subject code is required (2-10 alphanumeric chars).");
+            } else if (sname == null || sname.trim().isEmpty() || !sname.trim().matches("^[A-Za-z0-9. \\-]{3,100}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Subject name is required (min 3 chars).");
+            } else if (sdept == null || sdept.trim().isEmpty() || !sdept.trim().matches("^[A-Za-z \\-]{2,100}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Department is required (letters, spaces, dashes).");
+            } else if (lecturesStr == null || lecturesStr.trim().isEmpty()) {
+                req.getSession().setAttribute("flashMessage", "❌ Lectures per week is required.");
+            } else {
+                com.timetable.dao.SubjectDao sDao = new com.timetable.dao.SubjectDao();
+                if (sDao.existsByCode(code.trim())) {
+                    req.getSession().setAttribute("flashMessage",
+                        "❌ Duplicate: Subject code \"" + code.trim() + "\" already exists.");
+                } else if (sDao.existsByName(sname.trim())) {
+                    req.getSession().setAttribute("flashMessage",
+                        "❌ Duplicate: Subject \"" + sname.trim() + "\" already exists.");
+                } else {
+                    Subject s = new Subject();
+                    s.setCode(code.trim().toUpperCase());
+                    s.setName(sname.trim());
+                    s.setDepartment(sdept.trim());
+                    s.setLecturesPerWeek(Integer.parseInt(lecturesStr.trim()));
+                    s.setPractical(req.getParameter("isPractical") != null);
+                    resourceService.addSubject(s);
+                    req.getSession().setAttribute("flashMessage", "✅ Subject \"" + s.getName() + "\" added successfully!");
+                }
+            }
             redirectPage = "subjects";
 
         } else if ("add_room".equals(action)) {
-            Room r = new Room();
-            r.setName(req.getParameter("name"));
-            r.setCapacity(Integer.parseInt(req.getParameter("capacity")));
-            r.setType(Room.RoomType.valueOf(req.getParameter("type")));
-            resourceService.addRoom(r);
-            req.getSession().setAttribute("flashMessage", "✅ Room \"" + r.getName() + "\" added successfully!");
+            String rname = req.getParameter("name");
+            String capStr = req.getParameter("capacity");
+            String typeStr = req.getParameter("type");
+
+            if (rname == null || rname.trim().isEmpty() || !rname.trim().matches("^[A-Za-z0-9 \\-]{2,50}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Room name is required (alphanumeric, spaces, dashes; min 2 chars).");
+            } else if (capStr == null || capStr.trim().isEmpty()) {
+                req.getSession().setAttribute("flashMessage", "❌ Room capacity is required.");
+            } else {
+                com.timetable.dao.RoomDao rDao = new com.timetable.dao.RoomDao();
+                if (rDao.existsByName(rname.trim())) {
+                    req.getSession().setAttribute("flashMessage",
+                        "❌ Duplicate: Room \"" + rname.trim() + "\" already exists.");
+                } else {
+                    Room r = new Room();
+                    r.setName(rname.trim());
+                    r.setCapacity(Integer.parseInt(capStr.trim()));
+                    r.setType(Room.RoomType.valueOf(typeStr));
+                    resourceService.addRoom(r);
+                    req.getSession().setAttribute("flashMessage", "✅ Room \"" + r.getName() + "\" added successfully!");
+                }
+            }
             redirectPage = "rooms";
 
         } else if ("add_group".equals(action)) {
-            StudentGroup g = new StudentGroup();
-            g.setName(req.getParameter("name"));
-            resourceService.addStudentGroup(g);
-            req.getSession().setAttribute("flashMessage", "✅ Group \"" + g.getName() + "\" added successfully!");
+            String gname = req.getParameter("name");
+            if (gname == null || gname.trim().isEmpty() || !gname.trim().matches("^[A-Za-z0-9 \\-]{2,50}$")) {
+                req.getSession().setAttribute("flashMessage", "❌ Valid Group name is required (min 2 chars, letters/numbers).");
+            } else {
+                // Check for duplicate group name
+                boolean duplicate = resourceService.getAllStudentGroups().stream()
+                    .anyMatch(g -> g.getName().equalsIgnoreCase(gname.trim()));
+                if (duplicate) {
+                    req.getSession().setAttribute("flashMessage",
+                        "❌ Duplicate: Group \"" + gname.trim() + "\" already exists.");
+                } else {
+                    StudentGroup g = new StudentGroup();
+                    g.setName(gname.trim());
+                    resourceService.addStudentGroup(g);
+                    req.getSession().setAttribute("flashMessage", "✅ Group \"" + g.getName() + "\" added successfully!");
+                }
+            }
             redirectPage = "groups";
 
         } else if ("add_branch".equals(action)) {
             try {
-                Branch branch = new Branch();
-                branch.setCode(req.getParameter("code"));
-                branch.setName(req.getParameter("name"));
-                branch.setDepartment(req.getParameter("department_name"));
-                
-                com.timetable.dao.BranchDao branchDao = new com.timetable.dao.BranchDao();
-                branchDao.save(branch);
-                req.getSession().setAttribute("flashMessage", "✅ Branch \"" + branch.getName() + "\" added successfully!");
+                String bcode = req.getParameter("code");
+                String bname = req.getParameter("name");
+                String bdept = req.getParameter("department_name");
+
+                if (bcode == null || bcode.trim().isEmpty() || !bcode.trim().matches("^[A-Za-z0-9]{2,10}$")) {
+                    req.getSession().setAttribute("flashMessage", "❌ Valid Branch code is required (2-10 alphanumeric chars).");
+                } else if (bname == null || bname.trim().isEmpty() || !bname.trim().matches("^[A-Za-z0-9. \\-]{3,100}$")) {
+                    req.getSession().setAttribute("flashMessage", "❌ Valid Branch name is required (min 3 chars).");
+                } else if (bdept == null || bdept.trim().isEmpty() || !bdept.trim().matches("^[A-Za-z \\-]{2,50}$")) {
+                    req.getSession().setAttribute("flashMessage", "❌ Valid Department name is required (letters/spaces, min 2 chars).");
+                } else {
+                    com.timetable.dao.BranchDao branchDao = new com.timetable.dao.BranchDao();
+                    boolean dupCode = branchDao.findAll().stream()
+                        .anyMatch(b -> b.getCode().equalsIgnoreCase(bcode.trim()));
+                    boolean dupName = branchDao.findAll().stream()
+                        .anyMatch(b -> b.getName().equalsIgnoreCase(bname.trim()));
+                    if (dupCode) {
+                        req.getSession().setAttribute("flashMessage",
+                            "❌ Duplicate: Branch code \"" + bcode.trim() + "\" already exists.");
+                    } else if (dupName) {
+                        req.getSession().setAttribute("flashMessage",
+                            "❌ Duplicate: Branch \"" + bname.trim() + "\" already exists.");
+                    } else {
+                        Branch branch = new Branch();
+                        branch.setCode(bcode.trim().toUpperCase());
+                        branch.setName(bname.trim());
+                        branch.setDepartment(bdept.trim());
+                        branchDao.save(branch);
+                        req.getSession().setAttribute("flashMessage",
+                            "✅ Branch \"" + branch.getName() + "\" added successfully!");
+                    }
+                }
             } catch (Exception e) {
                 req.getSession().setAttribute("flashMessage", "❌ Error creating branch: " + e.getMessage());
             }

@@ -160,8 +160,8 @@
                                                         </c:choose>
                                                     </td>
                                                     <td class="px-6 py-4 text-right">
-                                                        <a href="${pageContext.request.contextPath}/admin?action=delete_workload&id=${w.id}"
-                                                            onclick="return confirm('Remove this workload?')"
+                                                        <a href="javascript:void(0)"
+                                                            onclick="openConfirmModal('Remove Workload', 'Are you sure you want to remove this workload?', '${pageContext.request.contextPath}/admin?action=delete_workload&id=${w.id}')"
                                                             class="p-1.5 hover:text-red-600 hover:bg-red-50 rounded-lg inline-flex transition-colors">
                                                             <span
                                                                 class="material-symbols-outlined text-base">delete</span>
@@ -251,6 +251,37 @@
                         </form>
                     </div>
                 </div>
+            <script>
+                // Confirm Modal Logic
+                function openConfirmModal(title, text, url) {
+                    document.getElementById('confirmModalTitle').textContent = title;
+                    document.getElementById('confirmModalText').textContent = text;
+                    document.getElementById('confirmModalLink').href = url;
+                    document.getElementById('confirmModal').classList.remove('hidden');
+                }
+                function closeConfirmModal() {
+                    document.getElementById('confirmModal').classList.add('hidden');
+                }
+            </script>
+            
+            <!-- Confirm Modal -->
+            <div id="confirmModal" class="hidden fixed inset-0 bg-gray-900/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+                <div class="bg-white rounded-2xl shadow-xl w-full max-w-md transform transition-all p-6">
+                    <div class="mb-6 flex items-start gap-4">
+                        <div class="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center flex-shrink-0">
+                            <span class="material-symbols-outlined text-red-600">warning</span>
+                        </div>
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-900" id="confirmModalTitle">Confirm Action</h3>
+                            <p class="text-sm text-gray-600 mt-1" id="confirmModalText">Are you sure you want to proceed?</p>
+                        </div>
+                    </div>
+                    <div class="flex gap-3 justify-end mt-4">
+                        <button type="button" onclick="closeConfirmModal()" class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50">Cancel</button>
+                        <a id="confirmModalLink" href="#" class="px-4 py-2 text-sm font-medium text-white bg-red-600 rounded-lg hover:bg-red-700">Confirm</a>
+                    </div>
+                </div>
+            </div>
             </body>
 
             </html>
