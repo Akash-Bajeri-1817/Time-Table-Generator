@@ -71,8 +71,11 @@ body {
 <body class="bg-background-light text-text-main min-h-screen">
 	<div class="layout-container flex flex-col min-h-screen">
 		<header
-			class="flex items-center justify-between border-b border-gray-200 px-8 py-4 bg-white sticky top-0 z-50 shadow-sm no-print">
+			class="flex items-center justify-between border-b border-gray-200 px-4 lg:px-8 py-4 bg-white sticky top-0 z-50 shadow-sm no-print">
 			<div class="flex items-center gap-8">
+<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+    <span class="material-symbols-outlined text-xl">menu</span>
+</button>
 				<div class="flex items-center gap-3">
 					<div
 						class="size-8 bg-forest-green rounded flex items-center justify-center text-white">

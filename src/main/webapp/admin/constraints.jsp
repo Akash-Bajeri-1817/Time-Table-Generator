@@ -43,8 +43,11 @@
                 <main class="flex-1 flex flex-col overflow-hidden">
                     <!-- Header -->
                     <header
-                        class="bg-white border-b border-border-color px-8 py-4 flex items-center justify-between shrink-0">
+                        class="bg-white border-b border-border-color px-4 lg:px-8 py-4 flex items-center justify-between shrink-0">
                         <div>
+<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+    <span class="material-symbols-outlined text-xl">menu</span>
+</button>
                             <nav class="flex items-center gap-2 text-sm text-text-body mb-1">
                                 <a href="${pageContext.request.contextPath}/admin" class="hover:text-primary">Admin</a>
                                 <span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
@@ -130,7 +133,7 @@
                                     </div>
 
                                     <!-- Time + Duration + Count -->
-                                    <div class="grid grid-cols-3 gap-5">
+                                    <div class="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                                         <div>
                                             <label class="block text-sm font-semibold text-text-header mb-1.5"
                                                 for="startTime">First Lecture Start</label>
@@ -174,7 +177,7 @@
                                                 class="size-4 rounded border-gray-300 text-primary focus:ring-primary/20" />
                                         </div>
                                         <div id="breakSection"
-                                            class="${empty activeConfig || !activeConfig.hasBreak ? 'hidden' : ''} grid grid-cols-2 gap-4 mt-2">
+                                            class="${empty activeConfig || !activeConfig.hasBreak ? 'hidden' : ''} grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
                                             <div>
                                                 <label class="block text-xs font-medium text-text-body mb-1">Break After
                                                     Lecture #</label>
@@ -236,7 +239,7 @@
                                         </p>
                                     </div>
                                 </div>
-                                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="p-6 grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 gap-3">
                                     <c:forEach var="hc" items="${[
                             'Room Conflict: A classroom can host only one lecture at a time',
                             'Teacher Conflict: A faculty member can teach only one class at a time',
@@ -270,7 +273,7 @@
                                             schedule quality score.</p>
                                     </div>
                                 </div>
-                                <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-3">
+                                <div class="p-6 grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 gap-3">
                                     <div
                                         class="flex items-start gap-3 p-4 bg-blue-50 border border-blue-100 rounded-xl">
                                         <span

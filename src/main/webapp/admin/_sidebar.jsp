@@ -3,7 +3,9 @@
         <%-- Shared sidebar fragment. Set 'currentPage' before including: <c:set var="currentPage"
             value="dashboard|faculty|rooms|subjects|groups|workload|constraints|timetable" />
         --%>
-        <aside class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 overflow-y-auto">
+        <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-40 lg:hidden hidden transition-opacity opacity-0"></div>
+<aside id="sidebar" class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 overflow-y-auto fixed lg:static inset-y-0 left-0 z-50 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
+
             <div class="flex flex-col gap-6 p-6">
                 <!-- Logo -->
                 <div class="flex items-center gap-3">
@@ -153,3 +155,18 @@
                 </a>
             </div>
         </aside>
+<script>
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebar-overlay');
+    if (sidebar.classList.contains('-translate-x-full')) {
+        sidebar.classList.remove('-translate-x-full');
+        overlay.classList.remove('hidden');
+        setTimeout(() => overlay.classList.remove('opacity-0'), 10);
+    } else {
+        sidebar.classList.add('-translate-x-full');
+        overlay.classList.add('opacity-0');
+        setTimeout(() => overlay.classList.add('hidden'), 300);
+    }
+}
+</script>

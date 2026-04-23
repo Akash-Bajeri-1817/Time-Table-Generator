@@ -49,6 +49,14 @@
 							color: white !important;
 							border-color: #2D5A27 !important;
 						}
+
+						.hide-scrollbar::-webkit-scrollbar {
+							display: none;
+						}
+						.hide-scrollbar {
+							-ms-overflow-style: none;
+							scrollbar-width: none;
+						}
 					</style>
 				</head>
 
@@ -59,46 +67,51 @@
 					<main class="flex-1 flex flex-col overflow-hidden">
 
 						<header
-							class="bg-white border-b border-border-color px-8 py-4 flex items-center justify-between shrink-0">
-							<div>
-								<nav class="flex items-center gap-2 text-sm text-text-body mb-1">
-									<a href="${pageContext.request.contextPath}/admin"
-										class="hover:text-primary">Admin</a>
-									<span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
-									<span class="font-semibold text-primary">Timetable</span>
-								</nav>
-								<h1 class="font-serif text-2xl font-bold text-primary">Generated Timetable</h1>
+							class="bg-white border-b border-border-color px-4 lg:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+							<div class="w-full md:w-auto">
+								<div class="flex items-center gap-2 mb-1">
+									<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+										<span class="material-symbols-outlined text-xl">menu</span>
+									</button>
+									<nav class="flex items-center gap-2 text-sm text-text-body">
+										<a href="${pageContext.request.contextPath}/admin"
+											class="hover:text-primary">Admin</a>
+										<span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
+										<span class="font-semibold text-primary">Timetable</span>
+									</nav>
+								</div>
+								<h1 class="font-serif text-2xl font-bold text-primary pl-1">Generated Timetable</h1>
 							</div>
-							<div class="flex items-center gap-3">
-								<span class="text-sm bg-primary-light px-3 py-1 rounded-full font-medium text-primary">
+							<div class="flex items-center gap-2 md:gap-3 w-full md:w-auto overflow-x-auto hide-scrollbar pb-2 md:pb-0">
+								<span class="shrink-0 text-sm bg-primary-light px-3 py-1 rounded-full font-medium text-primary whitespace-nowrap">
 									<span id="lectureCount">${schedules.size()}</span> lectures
 								</span>
 								<%-- Sample data dropdown --%>
-								<div class="relative" id="sampleDataMenu">
+								<div class="relative shrink-0" id="sampleDataMenu">
 									<button onclick="document.getElementById('sampleDropdown').classList.toggle('hidden')"
-										class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors">
+										class="flex items-center gap-2 px-4 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors whitespace-nowrap">
 										<span class="material-symbols-outlined text-lg">database</span> Load Data
 										<span class="material-symbols-outlined text-sm">expand_more</span>
 									</button>
 									<div id="sampleDropdown" class="hidden absolute right-0 mt-1 w-52 bg-white border border-gray-200 rounded-xl shadow-lg z-50 py-1">
 										<a href="${pageContext.request.contextPath}/admin?action=load_sample_data"
-											class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-header hover:bg-gray-50">
+											class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-header hover:bg-gray-50 whitespace-nowrap">
 											<span class="material-symbols-outlined text-base text-orange-500">school</span>
 											Load TY Sample Data
 										</a>
 										<a href="${pageContext.request.contextPath}/admin?action=load_fy_sample_data"
-											class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-header hover:bg-gray-50">
+											class="flex items-center gap-2 px-4 py-2.5 text-sm text-text-header hover:bg-gray-50 whitespace-nowrap">
 											<span class="material-symbols-outlined text-base text-blue-500">school</span>
 											Load FY Sample Data (2 PM)
 										</a>
 									</div>
 								</div>
 								<button onclick="exportPDF()"
-									class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors">
+									class="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors whitespace-nowrap">
 									<span class="material-symbols-outlined text-lg">download</span> Export PDF
 								</button>
 								<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
-									class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg shadow-sm hover:bg-primary/90 font-medium text-sm transition-colors">
+									class="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg shadow-sm hover:bg-primary/90 font-medium text-sm transition-colors whitespace-nowrap">
 									<span class="material-symbols-outlined text-lg">auto_awesome</span>
 									<c:choose>
 										<c:when test="${schedules.size() gt 0}">Re-Generate AI</c:when>
@@ -182,16 +195,16 @@
 
 																		<%-- Division tabs --%>
 																		<div
-																			class="flex items-center gap-2 mb-5 flex-wrap">
+																			class="flex items-center gap-2 mb-5 overflow-x-auto hide-scrollbar pb-2">
 																			<span
-																				class="text-xs font-semibold text-text-body uppercase tracking-wide mr-1">View:</span>
+																				class="shrink-0 text-xs font-semibold text-text-body uppercase tracking-wide mr-1">View:</span>
 																			<button
-																				class="tab-btn active px-4 py-2 rounded-lg text-sm font-semibold bg-white"
+																				class="shrink-0 whitespace-nowrap tab-btn active px-4 py-2 rounded-lg text-sm font-semibold bg-white"
 																				onclick="filterGroup('all', this)">All
 																				Divisions</button>
 																			<c:forEach var="grp" items="${groups}">
 																				<button
-																					class="tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-text-body"
+																					class="shrink-0 whitespace-nowrap tab-btn px-4 py-2 rounded-lg text-sm font-semibold bg-white text-text-body"
 																					data-gid="${grp.id}"
 																					onclick="filterGroup('${grp.id}', this)">
 																					📋 ${grp.name}
@@ -231,7 +244,8 @@
 																			<%-- Grid --%>
 																				<div id="timetableGridContainer"
 																					class="overflow-auto rounded-xl border border-border-color shadow-sm bg-white p-2">
-																					<table
+																					<div class="overflow-x-auto w-full">
+<table
 																						class="w-full border-collapse bg-white text-xs"
 																						style="min-width:960px;">
 																						<thead>
@@ -378,6 +392,7 @@
 																							</c:if>
 																						</tbody>
 																					</table>
+</div>
 																				</div>
 								</c:otherwise>
 							</c:choose>

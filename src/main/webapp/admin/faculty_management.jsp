@@ -90,8 +90,11 @@
                 <jsp:include page="_sidebar.jsp" />
                 <main class="flex-1 flex flex-col h-screen overflow-hidden relative">
                     <header
-                        class="h-16 bg-surface-white border-b border-border-color flex items-center justify-between px-6 shrink-0 z-10 shadow-sm">
+                        class="h-16 bg-surface-white border-b border-border-color flex items-center justify-between px-4 lg:px-6 shrink-0 z-10 shadow-sm">
                         <div class="flex items-center gap-2 text-sm text-text-body">
+<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+    <span class="material-symbols-outlined text-xl">menu</span>
+</button>
                             <a class="hover:text-primary transition-colors font-sans" href="#">Admin</a>
                             <span class="material-symbols-outlined text-base">chevron_right</span>
                             <span class="font-medium text-text-header font-sans">Faculty Management</span>

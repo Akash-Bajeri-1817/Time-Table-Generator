@@ -66,7 +66,7 @@
 
 					<!-- Top Navigation -->
 					<nav
-						class="bg-white border-b border-primary/10 shadow-sm text-gray-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50 no-print">
+						class="bg-white border-b border-primary/10 shadow-sm text-gray-800 px-4 md:px-6 py-4 flex flex-col sm:flex-row sm:items-center justify-between sticky top-0 z-50 no-print gap-4">
 						<div class="flex items-center gap-3">
 							<div class="size-10 rounded-lg bg-primary/10 flex items-center justify-center">
 								<span class="material-symbols-outlined text-2xl text-primary">event_note</span>
@@ -76,7 +76,7 @@
 								<p class="text-xs text-gray-500 font-medium tracking-wide">Timetable Pro</p>
 							</div>
 						</div>
-						<div>
+						<div class="flex">
 							<a href="${pageContext.request.contextPath}/"
 								class="text-gray-600 hover:text-primary transition-colors flex items-center gap-1.5 font-semibold text-sm">
 								<span class="material-symbols-outlined text-[18px]">home</span> Return Home
@@ -176,7 +176,7 @@
 																	%>
 
 																	<div
-																		class="flex items-center justify-between mb-4 no-print">
+																		class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 no-print gap-4">
 																		<div class="flex flex-col">
 																			<h3
 																				class="text-2xl font-bold font-serif text-primary">
@@ -185,7 +185,7 @@
 																				weekly lectures</p>
 																		</div>
 																		<button onclick="exportPDF()"
-																			class="flex items-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg shadow-sm hover:bg-gray-50 text-sm font-semibold transition-colors">
+																			class="flex items-center justify-center gap-2 px-4 py-2 bg-white border border-gray-300 text-gray-800 rounded-lg shadow-sm hover:bg-gray-50 text-sm font-semibold transition-colors">
 																			<span
 																				class="material-symbols-outlined text-[18px]">download</span>
 																			Export PDF

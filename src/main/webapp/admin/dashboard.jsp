@@ -67,13 +67,16 @@
 				<main class="flex-1 flex flex-col overflow-y-auto">
 					<!-- Top Bar -->
 					<header
-						class="h-20 bg-white border-b border-primary/10 flex items-center justify-between px-8 shrink-0">
+						class="h-20 bg-white border-b border-primary/10 flex items-center justify-between px-4 lg:px-8 shrink-0">
 						<div class="flex items-center gap-2 text-sm text-slate-500">
+<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+    <span class="material-symbols-outlined text-xl">menu</span>
+</button>
 							<a class="hover:text-primary" href="#">Admin</a>
 							<span class="material-symbols-outlined text-xs">chevron_right</span>
 							<span class="text-primary font-medium">Dashboard</span>
 						</div>
-						<div class="flex-1 max-w-2xl px-12">
+						<div class="flex-1 max-w-2xl px-4 lg:px-12 hidden md:block">
 							<div class="relative group">
 								<span
 									class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary">search</span>
@@ -113,7 +116,7 @@
 						</c:if>
 
 						<!-- KPI Hero Section -->
-						<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+						<div class="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
 							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
 								<span class="text-slate-500 text-sm font-medium mb-1">Active Groups</span>
 								<div class="flex items-baseline gap-2">
@@ -188,7 +191,7 @@
 									</div>
 								</div>
 
-								<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+								<div class="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
 									<c:forEach var="g" items="${groups}">
 										<div
 											class="bg-background-light p-4 rounded-lg border border-primary/10 hover:border-primary/30 transition-all">
@@ -275,7 +278,7 @@
 						</div>
 
 						<!-- Lower Grid -->
-						<div class="grid grid-cols-1 lg:grid-cols-3 gap-8 pb-12">
+						<div class="grid grid-cols-1 lg:grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 pb-12">
 							<!-- Upcoming Lectures Table -->
 							<div
 								class="lg:col-span-2 bg-white rounded-lg shadow-sm border border-primary/5 overflow-hidden">

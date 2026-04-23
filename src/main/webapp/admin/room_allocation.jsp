@@ -59,8 +59,11 @@
 
                     <!-- Top Bar -->
                     <header
-                        class="sticky top-0 z-20 flex items-center justify-between bg-white border-b border-slate-200 px-8 py-4">
+                        class="sticky top-0 z-20 flex items-center justify-between bg-white border-b border-slate-200 px-4 lg:px-8 py-4">
                         <div class="flex items-center gap-2 text-sm">
+<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+    <span class="material-symbols-outlined text-xl">menu</span>
+</button>
                             <a class="text-slate-500 hover:text-primary cursor-pointer transition-colors"
                                 href="${pageContext.request.contextPath}/admin/dashboard.jsp">Admin</a>
                             <span class="material-symbols-outlined text-base text-slate-400">chevron_right</span>
@@ -141,7 +144,7 @@
                         </div>
 
                         <!-- Room Grid -->
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                        <div class="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                             <c:choose>
                                 <c:when test="${empty rooms}">
                                     <div

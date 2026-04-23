@@ -53,8 +53,8 @@
 	<body class="bg-background font-display text-text-main antialiased selection:bg-primary/20 selection:text-primary">
 		<div class="relative flex min-h-screen w-full flex-col overflow-x-hidden">
 			<header
-				class="flex items-center justify-between border-b border-primary/10 px-6 py-4 md:px-20 lg:px-40 bg-background/80 backdrop-blur-md sticky top-0 z-50">
-				<div class="flex items-center gap-3">
+				class="flex flex-col sm:flex-row items-center justify-between border-b border-primary/10 px-4 py-4 md:px-20 lg:px-40 bg-background/80 backdrop-blur-md sticky top-0 z-50 gap-4">
+				<div class="flex items-center gap-3 w-full sm:w-auto justify-center sm:justify-start">
 					<div
 						class="size-8 bg-primary rounded-lg flex items-center justify-center text-white shadow-md shadow-primary/20">
 						<span class="material-symbols-outlined text-2xl">calendar_month</span>
@@ -62,16 +62,14 @@
 					<h2 class="text-xl font-bold tracking-tight text-primary-dark">Timetable
 						Pro</h2>
 				</div>
-				<nav class="hidden md:flex items-center gap-10">
-				<a class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
-					href="student">Student</a>
-			</nav>
-			<div class="flex items-center gap-4">
-				<button id="staffLoginBtn" onclick="openLoginModal()"
-					class="hidden sm:block text-sm font-semibold px-4 py-2 text-primary-dark hover:text-primary transition-colors">Staff Login</button>
-				<a class="flex items-center justify-center rounded-xl bg-primary px-6 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-dark hover:shadow-primary/30 active:scale-95"
-					href="student"> Get Started </a>
-			</div>
+				<div class="flex flex-wrap items-center justify-center gap-4 sm:gap-6 w-full sm:w-auto">
+					<a class="text-sm font-medium text-text-muted hover:text-primary transition-colors"
+						href="student">Student</a>
+					<button id="staffLoginBtn" onclick="openLoginModal()"
+						class="text-sm font-semibold text-primary-dark hover:text-primary transition-colors">Staff Login</button>
+					<a class="flex items-center justify-center rounded-xl bg-primary px-5 py-2.5 text-sm font-bold text-white shadow-lg shadow-primary/20 transition-all hover:bg-primary-dark hover:shadow-primary/30 active:scale-95"
+						href="student"> Get Started </a>
+				</div>
 			</header>
 			<main class="flex-1">
 				<section class="mx-auto max-w-[1280px] px-6 py-16 md:px-20 lg:px-40 lg:py-24">

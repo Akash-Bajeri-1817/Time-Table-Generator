@@ -28,8 +28,11 @@
             <jsp:include page="_sidebar.jsp" />
             <main class="flex-1 flex flex-col overflow-hidden">
                 <header
-                    class="bg-white border-b border-border-color px-8 py-4 flex items-center justify-between shrink-0">
+                    class="bg-white border-b border-border-color px-4 lg:px-8 py-4 flex items-center justify-between shrink-0">
                     <div>
+<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 mr-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+    <span class="material-symbols-outlined text-xl">menu</span>
+</button>
                         <nav class="flex items-center gap-2 text-sm text-text-body mb-1">
                             <a href="${pageContext.request.contextPath}/admin" class="hover:text-primary">Admin</a>
                             <span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
@@ -60,7 +63,7 @@
                         </c:choose>
                     </c:if>
                     <!-- Stats -->
-                    <div class="grid grid-cols-4 gap-4">
+                    <div class="grid grid-cols-1 md:grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
                         <div
                             class="bg-white rounded-xl p-5 border border-border-color shadow-sm flex items-center gap-4">
                             <div class="size-12 rounded-full bg-blue-50 flex items-center justify-center text-blue-600">
@@ -117,7 +120,8 @@
                     </div>
                     <!-- Table -->
                     <div class="bg-white rounded-xl border border-border-color shadow-sm overflow-hidden">
-                        <table class="w-full">
+                        <div class="overflow-x-auto w-full">
+<table class="w-full">
                             <thead class="bg-gray-50 border-b border-border-color">
                                 <tr>
                                     <th class="text-left px-6 py-4 text-xs font-semibold text-text-body uppercase">Code
@@ -183,6 +187,7 @@
                                 </c:choose>
                             </tbody>
                         </table>
+</div>
                         <div class="px-6 py-4 border-t border-border-color">
                             <p class="text-sm text-text-body">${subjects.size()} subjects in database</p>
                         </div>
@@ -207,7 +212,7 @@
                     <form method="post" action="${pageContext.request.contextPath}/admin" class="p-6 space-y-4"
                           id="subjectForm" onsubmit="return validateSubjectForm()">
                         <input type="hidden" name="action" value="add_subject" />
-                        <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                             <div>
                                 <label class="block text-sm font-medium mb-1.5">Subject Code *</label>
                                 <input type="text" name="code" id="sCode" placeholder="e.g. CS101"

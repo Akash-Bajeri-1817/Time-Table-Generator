@@ -54,14 +54,25 @@
 							box-shadow: 0 4px 12px rgba(45, 90, 39, .18);
 							transform: translateY(-1px);
 						}
+
+						.hide-scrollbar::-webkit-scrollbar {
+							display: none;
+						}
+						.hide-scrollbar {
+							-ms-overflow-style: none;
+							scrollbar-width: none;
+						}
 					</style>
 				</head>
 
 				<body class="bg-background-light font-sans text-text-header flex overflow-hidden h-screen">
 
+					<!-- Sidebar Overlay -->
+					<div id="sidebarOverlay" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-40 hidden lg:hidden" onclick="toggleSidebar()"></div>
+
 					<!-- Sidebar -->
-					<aside
-						class="w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 overflow-y-auto">
+					<aside id="sidebar"
+						class="fixed lg:static inset-y-0 left-0 z-50 w-72 bg-white border-r border-slate-200 flex flex-col justify-between shrink-0 overflow-y-auto transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out">
 						<div class="flex flex-col gap-6 p-6">
 							<!-- Logo -->
 							<div class="flex items-center gap-3">
@@ -113,23 +124,28 @@
 
 					<main class="flex-1 flex flex-col overflow-hidden">
 						<header
-							class="bg-white border-b border-border-color px-8 py-4 flex items-center justify-between shrink-0">
-							<div>
-								<nav class="flex items-center gap-2 text-sm text-text-body mb-1">
-									<a href="${pageContext.request.contextPath}/faculty"
-										class="hover:text-primary">Faculty</a>
-									<span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
-									<span class="font-semibold text-primary">My Schedule</span>
-								</nav>
-								<h1 class="font-serif text-2xl font-bold text-primary">Your Timetable</h1>
+							class="bg-white border-b border-border-color px-4 lg:px-8 py-4 flex flex-col md:flex-row md:items-center justify-between gap-4 shrink-0">
+							<div class="w-full md:w-auto">
+								<div class="flex items-center gap-2 mb-1">
+									<button onclick="toggleSidebar()" class="lg:hidden p-2 -ml-2 text-slate-500 hover:text-primary rounded-lg hover:bg-slate-100 flex items-center justify-center">
+										<span class="material-symbols-outlined text-xl">menu</span>
+									</button>
+									<nav class="flex items-center gap-2 text-sm text-text-body">
+										<a href="${pageContext.request.contextPath}/faculty"
+											class="hover:text-primary">Faculty</a>
+										<span class="material-symbols-outlined text-sm text-gray-400">chevron_right</span>
+										<span class="font-semibold text-primary">My Schedule</span>
+									</nav>
+								</div>
+								<h1 class="font-serif text-2xl font-bold text-primary pl-1">Your Timetable</h1>
 							</div>
 
-							<div class="flex items-center gap-3">
-								<span class="text-sm bg-primary-light px-3 py-1 rounded-full font-medium text-primary">
+							<div class="flex items-center gap-2 md:gap-3 w-full md:w-auto overflow-x-auto hide-scrollbar pb-2 md:pb-0 shrink-0">
+								<span class="shrink-0 text-sm bg-primary-light px-3 py-1 rounded-full font-medium text-primary whitespace-nowrap">
 									<span id="lectureCount">${schedules.size()}</span> assigned lectures
 								</span>
 								<button onclick="exportPDF()"
-									class="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors">
+									class="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-300 text-text-header rounded-lg shadow-sm hover:bg-gray-50 text-sm font-medium transition-colors whitespace-nowrap">
 									<span class="material-symbols-outlined text-lg">download</span> Export PDF
 								</button>
 							</div>
@@ -204,7 +220,8 @@
 																					<p class="text-sm text-gray-500">
 																						${facultyUser.department}</p>
 																				</div>
-																				<table
+																				<div class="overflow-x-auto w-full">
+<table
 																					class="w-full border-collapse bg-white text-xs"
 																					style="min-width:960px;">
 																					<thead>
@@ -286,6 +303,7 @@
 																						</c:forEach>
 																					</tbody>
 																				</table>
+</div>
 																			</div>
 								</c:otherwise>
 							</c:choose>
@@ -293,6 +311,13 @@
 					</main>
 
 					<script>
+						function toggleSidebar() {
+							const sidebar = document.getElementById('sidebar');
+							const overlay = document.getElementById('sidebarOverlay');
+							sidebar.classList.toggle('-translate-x-full');
+							overlay.classList.toggle('hidden');
+						}
+
 						function exportPDF() {
 							var element = document.getElementById('timetableGridContainer');
 							var header = document.getElementById('pdfHeader');
