@@ -47,6 +47,6 @@ public class FacultyServlet extends HttpServlet {
         req.setAttribute("divisions", allDivisions);
         req.setAttribute("facultyUser", facultyUser);
 
-        req.getRequestDispatcher("faculty/dashboard.jsp").forward(req, resp);
+        req.getRequestDispatcher("/faculty/dashboard.jsp").forward(req, resp);
     }
 }

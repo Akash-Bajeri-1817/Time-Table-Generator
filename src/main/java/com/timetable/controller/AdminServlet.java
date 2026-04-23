@@ -235,7 +235,7 @@ public class AdminServlet extends HttpServlet {
             } else if ("configure_timeslots".equals(action)) {
                 TimetableConfig activeConfig = configDao.getActiveConfig(com.timetable.model.YearLevel.FY);
                 req.setAttribute("activeConfig", activeConfig);
-                req.getRequestDispatcher("admin/timeslot_config.jsp").forward(req, resp);
+                req.getRequestDispatcher("/admin/timeslot_config.jsp").forward(req, resp);
                 return;
 
             } else if ("view_timetable".equals(action)) {
@@ -524,22 +524,22 @@ public class AdminServlet extends HttpServlet {
             req.setAttribute("rooms", resourceService.getAllRooms());
             req.setAttribute("groups", resourceService.getAllStudentGroups());
             req.setAttribute("workloads", resourceService.getAllWorkloads());
-            req.getRequestDispatcher("admin/faculty_management.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/faculty_management.jsp").forward(req, resp);
 
         } else if ("rooms".equals(page)) {
             req.setAttribute("rooms", resourceService.getAllRooms());
-            req.getRequestDispatcher("admin/room_allocation.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/room_allocation.jsp").forward(req, resp);
 
         } else if ("subjects".equals(page)) {
             req.setAttribute("subjects", resourceService.getAllSubjects());
-            req.getRequestDispatcher("admin/subjects.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/subjects.jsp").forward(req, resp);
 
         } else if ("groups".equals(page)) {
             req.setAttribute("groups", resourceService.getAllStudentGroups());
             req.setAttribute("divisions", divisionDao.findAll());
             com.timetable.dao.BranchDao branchDao = new com.timetable.dao.BranchDao();
             req.setAttribute("branches", branchDao.findAll());
-            req.getRequestDispatcher("admin/student_groups.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/student_groups.jsp").forward(req, resp);
 
         } else if ("workload".equals(page)) {
             req.setAttribute("workloads", resourceService.getAllWorkloads());
@@ -547,43 +547,46 @@ public class AdminServlet extends HttpServlet {
             req.setAttribute("subjects", resourceService.getAllSubjects());
             req.setAttribute("groups", resourceService.getAllStudentGroups());
             req.setAttribute("divisions", divisionDao.findAll());
-            req.getRequestDispatcher("admin/workload.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/workload.jsp").forward(req, resp);
 
         } else if ("timetable".equals(page)) {
             req.setAttribute("schedules", scheduleDao.findAll());
             req.setAttribute("groups", resourceService.getAllStudentGroups());
-            req.getRequestDispatcher("admin/view_timetable.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/view_timetable.jsp").forward(req, resp);
 
         } else if ("constraints".equals(page)) {
             TimetableConfig activeConfig = configDao.getActiveConfig(com.timetable.model.YearLevel.FY);
             req.setAttribute("activeConfig", activeConfig);
-            req.getRequestDispatcher("admin/constraints.jsp").forward(req, resp);
+            req.getRequestDispatcher("/admin/constraints.jsp").forward(req, resp);
 
         } else {
             // Default: Dashboard
-            List<Faculty> faculties = resourceService.getAllFaculty();
-            List<Subject> subjects = resourceService.getAllSubjects();
-            List<Room> rooms = resourceService.getAllRooms();
-            List<StudentGroup> groups = resourceService.getAllStudentGroups();
-            List<Workload> workloads = resourceService.getAllWorkloads();
-            List<Schedule> schedules = scheduleDao.findAll();
+            try (org.hibernate.Session session = com.timetable.util.HibernateUtil.getSessionFactory().openSession()) {
+                Long facultyCount = session.createQuery("select count(f) from Faculty f", Long.class).uniqueResult();
+                Long subjectCount = session.createQuery("select count(s) from Subject s", Long.class).uniqueResult();
+                Long roomCount = session.createQuery("select count(r) from Room r", Long.class).uniqueResult();
+                Long groupCount = session.createQuery("select count(g) from StudentGroup g", Long.class).uniqueResult();
+                Long workloadCount = session.createQuery("select count(w) from Workload w", Long.class).uniqueResult();
+                Long scheduleCount = session.createQuery("select count(s) from Schedule s", Long.class).uniqueResult();
 
-            req.setAttribute("faculties", faculties);
-            req.setAttribute("subjects", subjects);
-            req.setAttribute("rooms", rooms);
-            req.setAttribute("groups", groups);
-            req.setAttribute("workloads", workloads);
-            req.setAttribute("schedules", schedules);
+                // Only fetch actual groups for the "Recent Schedules" section
+                List<StudentGroup> groups = session.createQuery("from StudentGroup", StudentGroup.class).list();
+                
+                // Only fetch top 5 workloads for the sample table
+                List<Workload> workloads = session.createQuery("from Workload", Workload.class).setMaxResults(5).list();
 
-            // Stats for dashboard cards
-            req.setAttribute("facultyCount", faculties.size());
-            req.setAttribute("subjectCount", subjects.size());
-            req.setAttribute("roomCount", rooms.size());
-            req.setAttribute("groupCount", groups.size());
-            req.setAttribute("workloadCount", workloads.size());
-            req.setAttribute("scheduleCount", schedules.size());
+                req.setAttribute("facultyCount", facultyCount);
+                req.setAttribute("subjectCount", subjectCount);
+                req.setAttribute("roomCount", roomCount);
+                req.setAttribute("groupCount", groupCount);
+                req.setAttribute("workloadCount", workloadCount);
+                req.setAttribute("scheduleCount", scheduleCount);
 
-            req.getRequestDispatcher("admin/dashboard.jsp").forward(req, resp);
+                req.setAttribute("groups", groups);
+                req.setAttribute("workloads", workloads);
+
+                req.getRequestDispatcher("/admin/dashboard.jsp").forward(req, resp);
+            }
         }
     }
 }

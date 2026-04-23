@@ -23,6 +23,9 @@
 		<!-- Auto-generation of tables (update schema on startup) -->
 		<property name="hbm2ddl.auto">update</property>
 
+		<!-- Enable batch fetching for N+1 performance optimization -->
+		<property name="default_batch_fetch_size">50</property>
+
 		<!-- Current Session Context -->
 		<property name="current_session_context_class">thread</property>
 

@@ -117,24 +117,21 @@
 							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
 								<span class="text-slate-500 text-sm font-medium mb-1">Active Groups</span>
 								<div class="flex items-baseline gap-2">
-									<span class="text-3xl font-bold text-primary font-serif">${empty groups ? '0' :
-										groups.size()}</span>
+									<span class="text-3xl font-bold text-primary font-serif">${groupCount != null ? groupCount : '0'}</span>
 									<span class="text-xs text-green-600 font-medium">Live</span>
 								</div>
 							</div>
 							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
 								<span class="text-slate-500 text-sm font-medium mb-1">Total Faculty</span>
 								<div class="flex items-baseline gap-2">
-									<span class="text-3xl font-bold text-primary font-serif">${empty faculties ? '0' :
-										faculties.size()}</span>
+									<span class="text-3xl font-bold text-primary font-serif">${facultyCount != null ? facultyCount : '0'}</span>
 									<span class="text-xs text-slate-400 font-medium">Profiles</span>
 								</div>
 							</div>
 							<div class="bg-white p-6 rounded-lg shadow-sm border border-primary/5 flex flex-col">
 								<span class="text-slate-500 text-sm font-medium mb-1">Courses</span>
 								<div class="flex items-baseline gap-2">
-									<span class="text-3xl font-bold text-primary font-serif">${empty subjects ? '0' :
-										subjects.size()}</span>
+									<span class="text-3xl font-bold text-primary font-serif">${subjectCount != null ? subjectCount : '0'}</span>
 									<span class="text-xs text-green-600 font-medium">Active</span>
 								</div>
 							</div>
@@ -144,8 +141,7 @@
 								</div>
 								<span class="text-slate-500 text-sm font-medium mb-1 z-10">Workloads</span>
 								<div class="flex items-baseline gap-2 z-10">
-									<span class="text-3xl font-bold text-primary font-serif">${empty workloads ? '0' :
-										workloads.size()}</span>
+									<span class="text-3xl font-bold text-primary font-serif">${workloadCount != null ? workloadCount : '0'}</span>
 									<span class="text-xs text-primary font-medium">Assigned</span>
 								</div>
 							</div>

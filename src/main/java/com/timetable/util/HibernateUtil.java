@@ -28,6 +28,10 @@ public class HibernateUtil {
                 props.setProperty("hibernate.connection.sslmode",       "require");
                 // Smaller pool for NeonDB free tier (max 10 connections)
                 props.setProperty("hibernate.connection.pool_size", "5");
+                
+                // Enable Batch Fetching to solve N+1 query problem and drastically improve performance
+                props.setProperty("hibernate.default_batch_fetch_size", "50");
+                
                 configuration.addProperties(props);
 
                 System.out.println("[HibernateUtil] Using environment-variable database configuration.");
