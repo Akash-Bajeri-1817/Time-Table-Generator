@@ -4,7 +4,6 @@ services:
     env: docker
     dockerfilePath: ./Dockerfile
     plan: free
-    port: 8080             # Tomcat default port
     healthCheckPath: /
     envVars:
       - key: DB_URL
