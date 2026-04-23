@@ -1,0 +1,21 @@
+# Ignore compiled output - Docker will build fresh
+target/
+
+# IDE and Eclipse project files
+.classpath
+.project
+.settings/
+.apt_generated/
+.apt_generated_tests/
+.metadata/
+
+# Git
+.git/
+.gitignore
+
+# VS Code
+.vscode/
+
+# OS files
+.DS_Store
+Thumbs.db

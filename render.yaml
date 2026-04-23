@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: timetable-generator
+    env: docker
+    dockerfilePath: ./Dockerfile
+    plan: free
+    port: 8080             # Tomcat default port
+    healthCheckPath: /
+    envVars:
+      - key: DB_URL
+        value: jdbc:postgresql://ep-cool-mouse-a13x6jln-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require
+      - key: DB_USERNAME
+        value: neondb_owner
+      - key: DB_PASSWORD
+        value: npg_98QJDqwhZxfW

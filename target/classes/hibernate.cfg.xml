@@ -4,11 +4,11 @@
         "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
 <hibernate-configuration>
 	<session-factory>
-		<!-- Database Connection Settings -->
+		<!-- Database Connection Settings  localhost -->
 		<property name="connection.driver_class">org.postgresql.Driver</property>
-		<property name="connection.url">jdbc:postgresql://localhost:5432/timetable_db</property>
-		<property name="connection.username">root</property>
-		<property name="connection.password">root</property>
+		<property name="connection.url">jdbc:postgresql://ep-cool-mouse-a13x6jln-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require</property>
+		<property name="connection.username">neondb_owner</property>
+		<property name="connection.password">npg_98QJDqwhZxfW</property>
 
 		<!-- JDBC Connection Pool (using default Hibernate pool for simplicity) -->
 		<property name="connection.pool_size">10</property>
