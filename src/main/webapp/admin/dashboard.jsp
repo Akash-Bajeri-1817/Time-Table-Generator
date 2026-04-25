@@ -77,13 +77,13 @@
 							<span class="text-primary font-medium">Dashboard</span>
 						</div>
 						<div class="flex-1 max-w-2xl px-4 lg:px-12 hidden md:block">
-							<div class="relative group">
+						<!-- 	<div class="relative group">
 								<span
 									class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary">search</span>
 								<input
 									class="w-full h-11 bg-background-light border-none rounded-xl pl-12 pr-4 focus:ring-2 focus:ring-primary/20 text-sm placeholder:text-slate-400"
 									placeholder="Search for faculty, rooms, or schedules..." type="text" />
-							</div>
+							</div> -->
 						</div>
 						<div class="flex items-center gap-6">
 							<!--  <button class="relative p-2 text-slate-500 hover:bg-primary/5 rounded-lg transition-colors">
@@ -153,7 +153,8 @@
 						<!-- Action Shortcuts -->
 						<div class="flex flex-wrap items-center gap-4">
 							<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
-								class="bg-gradient-to-r from-primary to-[#4A7D41] text-white px-6 py-3 rounded-lg font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2">
+								class="bg-gradient-to-r from-primary to-[#4A7D41] text-white px-6 py-3 rounded-lg font-bold text-sm shadow-md hover:shadow-lg transition-all flex items-center gap-2"
+								onclick="showLoader()">
 								<span class="material-symbols-outlined text-lg">auto_awesome</span>
 								Generate AI Timetable
 							</a>
@@ -385,7 +386,29 @@
         function closeConfirmModal() {
             document.getElementById('confirmModal').classList.add('hidden');
         }
+
+        function showLoader() {
+            var loader = document.getElementById('aiLoaderOverlay');
+            if (loader) {
+                loader.classList.remove('hidden');
+                loader.classList.add('flex');
+            }
+        }
     </script>
+
+	<!-- Full Screen Loader Overlay -->
+	<div id="aiLoaderOverlay" class="hidden fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex-col items-center justify-center transition-all duration-300">
+		<div class="relative w-24 h-24 mb-6">
+			<!-- Outer spinning ring -->
+			<div class="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+			<!-- Inner pulse -->
+			<div class="absolute inset-2 rounded-full bg-primary/10 animate-pulse flex items-center justify-center">
+				<span class="material-symbols-outlined text-primary text-3xl animate-bounce">auto_awesome</span>
+			</div>
+		</div>
+		<h2 class="text-2xl font-serif font-bold text-gray-900 mb-2">Generating Timetable...</h2>
+		<p class="text-gray-500 text-sm max-w-md text-center">The AI is currently analyzing constraints and calculating the optimal schedule. This may take a few moments.</p>
+	</div>
 		</body>
 
 		</html>

@@ -111,7 +111,8 @@
 									<span class="material-symbols-outlined text-lg">download</span> Export PDF
 								</button>
 								<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
-									class="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg shadow-sm hover:bg-primary/90 font-medium text-sm transition-colors whitespace-nowrap">
+									class="shrink-0 flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg shadow-sm hover:bg-primary/90 font-medium text-sm transition-colors whitespace-nowrap"
+									onclick="showLoader()">
 									<span class="material-symbols-outlined text-lg">auto_awesome</span>
 									<c:choose>
 										<c:when test="${schedules.size() gt 0}">Re-Generate AI</c:when>
@@ -157,7 +158,8 @@
 												FY Sample Data (2 PM)
 											</a>
 											<a href="${pageContext.request.contextPath}/admin?action=generate_ai"
-												class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90">
+												class="flex items-center gap-2 px-5 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-primary/90"
+												onclick="showLoader()">
 												<span
 													class="material-symbols-outlined text-lg">auto_awesome</span>Generate
 												AI Timetable
@@ -429,7 +431,29 @@
 
 							html2pdf().set(opt).from(element).save();
 						}
+
+						function showLoader() {
+							var loader = document.getElementById('aiLoaderOverlay');
+							if (loader) {
+								loader.classList.remove('hidden');
+								loader.classList.add('flex');
+							}
+						}
 					</script>
+
+					<!-- Full Screen Loader Overlay -->
+					<div id="aiLoaderOverlay" class="hidden fixed inset-0 bg-white/80 backdrop-blur-sm z-[100] flex-col items-center justify-center transition-all duration-300">
+						<div class="relative w-24 h-24 mb-6">
+							<!-- Outer spinning ring -->
+							<div class="absolute inset-0 rounded-full border-4 border-primary/20 border-t-primary animate-spin"></div>
+							<!-- Inner pulse -->
+							<div class="absolute inset-2 rounded-full bg-primary/10 animate-pulse flex items-center justify-center">
+								<span class="material-symbols-outlined text-primary text-3xl animate-bounce">auto_awesome</span>
+							</div>
+						</div>
+						<h2 class="text-2xl font-serif font-bold text-gray-900 mb-2">Generating Timetable...</h2>
+						<p class="text-gray-500 text-sm max-w-md text-center">The AI is currently analyzing constraints and calculating the optimal schedule. This may take a few moments.</p>
+					</div>
 				</body>
 
 				</html>
